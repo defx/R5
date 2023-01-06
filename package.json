@@ -1,0 +1,17 @@
+{
+  "name": "literally",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha-express --coverage",
+    "test:watch": "mocha-express --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mocha-express": "^0.1.2"
+  }
+}
