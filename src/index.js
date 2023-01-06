@@ -1,4 +1,5 @@
 import { configure } from "./store.js"
+import { fragmentFromTemplate, walk } from "./helpers.js"
 
 function _(value) {
   if (typeof value === "undefined") return ""
@@ -39,8 +40,19 @@ export const define = (name, factory) => {
         let state = getState()
 
         const content = config.render(state)
-
-        console.log(content)
+        const frag = fragmentFromTemplate(content)
+        walk(frag.firstChild, (node) => {
+          switch (node.nodeType) {
+            case node.TEXT_NODE: {
+              console.log("TEXT", node)
+              break
+            }
+            case node.ELEMENT_NODE: {
+              console.log("ELEMENT", node)
+              break
+            }
+          }
+        })
       }
     }
   )
