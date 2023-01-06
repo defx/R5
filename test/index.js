@@ -5,7 +5,7 @@ function reformat(str) {
 }
 
 describe("...", () => {
-  it("replaces text interpolations with placeholders", () => {
+  it("replaces text and attribute interpolations with single placeholders", () => {
     const classes = ["my1", "px2"]
     const greeting = "hello world!"
 
@@ -13,7 +13,7 @@ describe("...", () => {
 
     assert.equal(tpl, `<p class="{{ 0 }}">{{ 1 }}</p>`)
   })
-  it("replaces arrays with repeated blocks", () => {
+  it("replaces repeated blocks with a single placeholder", () => {
     const items = [{ name: "kim" }, { name: "thea" }, { name: "ericka" }]
 
     const tpl = html`<ul>
