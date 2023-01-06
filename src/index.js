@@ -23,8 +23,6 @@ export const html = (strings, ...values) => {
 export const define = (name, factory) => {
   if (customElements?.get(name)) return
 
-  const subscribers = []
-
   customElements.define(
     name,
     class extends HTMLElement {
