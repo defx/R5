@@ -7,13 +7,13 @@ export const html = (strings, ...values) => {
   let c = 0
   let l = values.length
 
-  const convert = (str, value) => {
+  const convert = () => {
     return `{{ ${c++} }}`
   }
 
   return strings
     .reduce((a, s, i) => {
-      return a + s + (i < l ? convert(s, values[i]) : ``)
+      return a + s + (i < l ? convert() : ``)
     }, "")
     .trim()
 }
