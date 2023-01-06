@@ -1,5 +1,5 @@
 import { walk } from "./helpers.js"
-import { hasMustache, parseMustache } from "./token.js"
+import { hasMustache, parseMustache, getParts } from "./token.js"
 
 export const parse = (rootNode, subscribers = []) => {
   walk(rootNode, (node) => {
@@ -20,16 +20,18 @@ export const parse = (rootNode, subscribers = []) => {
         break
       }
       case node.ELEMENT_NODE: {
-        let attrs = [...node.attributes] //.sort(compareAttributes)
+        let attrs = [...node.attributes]
         let i = attrs.length
         while (i--) {
           let { name, value } = attrs[i]
           if (hasMustache(value)) {
-            // @todo handle mutiple expression in single value
-            const i = +parseMustache(value)
+            const parts = getParts(value)
             let prevVal
             subscribers.push((values) => {
-              const nextVal = values[i]
+              const nextVal = parts.reduce((a, { type, value }) => {
+                return a + (type === 1 ? value : values[value])
+              }, "")
+
               if (nextVal !== prevVal) {
                 node.setAttribute(name, nextVal)
               }

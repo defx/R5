@@ -18,7 +18,7 @@ describe("define()", () => {
 
     assert.equal($(`x-foo p`).textContent, "hello!")
   })
-  it("replaces attributes", async () => {
+  it("replaces single attributes", async () => {
     const name = createName()
     define(name, () => {
       return {
@@ -31,5 +31,20 @@ describe("define()", () => {
     mount(`<${name}></${name}>`)
 
     assert.equal($(`${name} p`).getAttribute("class"), "mb1")
+  })
+
+  it("replaces multiple attributes", async () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          foo: "mb1",
+        },
+        render: ({ foo }) => html`<p class="${foo} bar">hi!</p>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    assert.equal($(`${name} p`).getAttribute("class"), "mb1 bar")
   })
 })

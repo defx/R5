@@ -20,17 +20,13 @@ export const getParts = (value) =>
         return {
           type: VALUE,
           value,
-          negated: false,
         }
 
-      value = match[1].trim()
-      let negated = value.charAt(0) === "!"
-      if (negated) value = value.slice(1)
+      value = +match[1].trim()
 
       return {
         type: KEY,
         value,
-        negated,
       }
     })
 
