@@ -64,10 +64,6 @@ export const define = (name, factory) => {
         this.prepend(frag)
 
         onChange(config.render)
-
-        // setTimeout(() => {
-        //   config.render({ message: "goodbye!" })
-        // }, 1000)
       }
     }
   )
