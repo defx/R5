@@ -1,10 +1,10 @@
-import { html } from "../src/index.js"
+import { define, html } from "../src/index.js"
 
 function reformat(str) {
   return str.replace(/\n|\s{2,}/g, "")
 }
 
-describe("...", () => {
+describe("html()", () => {
   it("replaces text and attribute interpolations with single placeholders", () => {
     const classes = ["my1", "px2"]
     const greeting = "hello world!"
@@ -21,5 +21,18 @@ describe("...", () => {
     </ul>`
 
     assert.equal(reformat(tpl), `<ul>{{ 0 }}</ul>`)
+  })
+})
+describe("define()", () => {
+  it("...", async () => {
+    define("x-foo", () => {
+      return {
+        state: {
+          message: "hello!",
+        },
+        render: ({ message }) => html`<p>${message}</p>`,
+      }
+    })
+    mount(`<x-foo></x-foo>`)
   })
 })
