@@ -48,4 +48,19 @@ describe("define()", () => {
 
     assert.equal($(`p`).getAttribute("class"), "mb1 bar")
   })
+
+  it("interpolates text", async () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          message: "hello!",
+        },
+        render: ({ message }) => html`<p>frankie says ${message}</p>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    assert.equal($(`p`).textContent, "frankie says hello!")
+  })
 })

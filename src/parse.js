@@ -7,10 +7,13 @@ export const parse = (rootNode, subscribers = []) => {
       case node.TEXT_NODE: {
         let value = node.textContent
         if (hasMustache(value)) {
-          const i = +parseMustache(value)
+          const parts = getParts(value)
           let prevVal
           subscribers.push((values) => {
-            const nextVal = values[i]
+            const nextVal = parts.reduce((a, { type, value }) => {
+              return a + (type === 1 ? value : values[value])
+            }, "")
+
             if (nextVal !== prevVal) {
               node.textContent = nextVal
             }
