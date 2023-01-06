@@ -34,5 +34,7 @@ describe("define()", () => {
       }
     })
     mount(`<x-foo></x-foo>`)
+
+    assert.equal($(`x-foo p`).textContent, "hello!")
   })
 })

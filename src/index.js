@@ -7,21 +7,6 @@ function _(value) {
   return String(Array.isArray(value) ? value.join("") : value)
 }
 
-// export const html = (strings, ...values) => {
-//   let c = 0
-//   let l = values.length
-
-//   const convert = () => {
-//     return `{{ ${c++} }}`
-//   }
-
-//   return strings
-//     .reduce((a, s, i) => {
-//       return a + s + (i < l ? convert() : ``)
-//     }, "")
-//     .trim()
-// }
-
 let xvalues
 
 export const html = (strings, ...values) => {
@@ -85,13 +70,14 @@ export const define = (name, factory) => {
               break
             }
             case node.ELEMENT_NODE: {
-              console.log("ELEMENT", node)
+              // @todo
               break
             }
           }
         })
 
         const originalRenderFn = config.render
+
         config.render = (state) => {
           let v = originalRenderFn(state)
           subscribers.forEach((fn) => fn(xvalues))
@@ -100,6 +86,7 @@ export const define = (name, factory) => {
         }
 
         config.render(getState())
+
         this.prepend(frag)
 
         setTimeout(() => {
