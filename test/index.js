@@ -63,4 +63,32 @@ describe("define()", () => {
 
     assert.equal($(`p`).textContent, "frankie says hello!")
   })
+
+  it("manages repeated blocks", async () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          items: [{ name: "kim" }, { name: "thea" }, { name: "ericka" }],
+        },
+        render: ({ items }) =>
+          html`<ul>
+            ${items.map(({ name }) => html`<li>${name}</li>`)}
+          </ul>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    /*
+
+    1.
+    
+    <ul>{{ 0 }}</ul>
+
+    2.      
+
+    <li>{{ 0 }}</li>
+    
+    */
+  })
 })
