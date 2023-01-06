@@ -6,7 +6,8 @@ function reformat(str) {
 
 describe("define()", () => {
   it("replaces text", async () => {
-    define("x-foo", () => {
+    const name = createName()
+    define(name, () => {
       return {
         state: {
           message: "hello!",
@@ -14,9 +15,9 @@ describe("define()", () => {
         render: ({ message }) => html`<p>${message}</p>`,
       }
     })
-    mount(`<x-foo></x-foo>`)
+    mount(`<${name}></${name}>`)
 
-    assert.equal($(`x-foo p`).textContent, "hello!")
+    assert.equal($(`p`).textContent, "hello!")
   })
   it("replaces single attributes", async () => {
     const name = createName()
@@ -30,10 +31,10 @@ describe("define()", () => {
     })
     mount(`<${name}></${name}>`)
 
-    assert.equal($(`${name} p`).getAttribute("class"), "mb1")
+    assert.equal($(`p`).getAttribute("class"), "mb1")
   })
 
-  it("replaces multiple attributes", async () => {
+  it("interpolates attributes", async () => {
     const name = createName()
     define(name, () => {
       return {
@@ -45,6 +46,6 @@ describe("define()", () => {
     })
     mount(`<${name}></${name}>`)
 
-    assert.equal($(`${name} p`).getAttribute("class"), "mb1 bar")
+    assert.equal($(`p`).getAttribute("class"), "mb1 bar")
   })
 })
