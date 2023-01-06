@@ -1,5 +1,6 @@
 import { configure } from "./store.js"
 import { fragmentFromTemplate, walk } from "./helpers.js"
+import { hasMustache, parseMustache } from "./token.js"
 
 function _(value) {
   if (typeof value === "undefined") return ""
@@ -24,6 +25,8 @@ export const html = (strings, ...values) => {
 export const define = (name, factory) => {
   if (customElements?.get(name)) return
 
+  const subscribers = []
+
   customElements.define(
     name,
     class extends HTMLElement {
@@ -41,10 +44,22 @@ export const define = (name, factory) => {
 
         const content = config.render(state)
         const frag = fragmentFromTemplate(content)
+
         walk(frag.firstChild, (node) => {
           switch (node.nodeType) {
             case node.TEXT_NODE: {
-              console.log("TEXT", node)
+              let value = node.textContent
+              if (hasMustache(value)) {
+                const i = +parseMustache(value)
+                let prevVal
+                subscribers.push((values) => {
+                  const nextVal = values[i]
+                  if (nextVal !== prevVal) {
+                    node.textContent = nextVal
+                  }
+                  prevVal = nextVal
+                })
+              }
               break
             }
             case node.ELEMENT_NODE: {
