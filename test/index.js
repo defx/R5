@@ -69,11 +69,13 @@ describe("define()", () => {
     define(name, () => {
       return {
         state: {
-          items: [{ name: "kim" }, { name: "thea" }, { name: "ericka" }],
+          someClass: "xyz",
+          //   items: [],
+          //   items: [{ name: "kim" }, { name: "thea" }, { name: "ericka" }],
         },
-        render: ({ items }) =>
-          html`<ul>
-            ${items.map(({ name }) => html`<li>${name}</li>`)}
+        render: ({ items, someClass }) =>
+          html`<ul class="${someClass}">
+            ${items?.map(({ name }) => html`<li>${name}</li>`)}
           </ul>`,
       }
     })

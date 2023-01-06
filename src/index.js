@@ -7,17 +7,29 @@ function _(value) {
   return String(Array.isArray(value) ? value.join("") : value)
 }
 
-let xvalues
+function reformat(str) {
+  return str.replace(/\n|\s{2,}/g, "")
+}
+
+const cache = {}
 
 export const html = (strings, ...values) => {
-  xvalues = values
+  const k = strings.join("")
 
-  let l = values.length
-  return strings
-    .reduce((a, s, i) => {
-      return a + s + (i < l ? values[i] : ``)
-    }, "")
-    .trim()
+  if (!(k in cache)) {
+    let l = values.length
+    const tpl = strings
+      .reduce((a, s, i) => {
+        return a + s + (i < l ? `{{ ${i} }}` : ``)
+      }, "")
+      .trim()
+    cache[k] = reformat(tpl)
+  }
+
+  return {
+    tpl: cache[k],
+    values,
+  }
 }
 
 export const define = (name, factory) => {
@@ -31,37 +43,16 @@ export const define = (name, factory) => {
 
         if (config instanceof Promise) config = await config
 
-        let c = 0
-
         const { dispatch, getState, onChange, updated, refs } = configure(
           config,
           this
         )
 
-        const content = config.render(
-          new Proxy(
-            {},
-            {
-              get() {
-                return `{{ ${c++} }}`
-              },
-            }
-          )
-        )
-        const frag = fragmentFromTemplate(content)
-        const subscribers = parse(frag.firstChild)
-        const originalRenderFn = config.render
+        const x = config.render(getState())
 
-        config.render = (state) => {
-          const v = originalRenderFn(state)
-          subscribers.forEach((fn) => fn(xvalues))
-          xvalues = null
-          return v
-        }
+        console.log(x)
 
-        config.render(getState())
-
-        this.prepend(frag)
+        // this.prepend(frag)
 
         onChange(config.render)
       }
