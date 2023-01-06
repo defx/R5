@@ -31,7 +31,7 @@ export function configure({
 
   function updateState(o) {
     state = getStateWrapper({ ...o })
-    onChangeCallback()
+    onChangeCallback(state)
   }
 
   updateState(initialState)

@@ -53,7 +53,7 @@ export const define = (name, factory) => {
         const originalRenderFn = config.render
 
         config.render = (state) => {
-          let v = originalRenderFn(state)
+          const v = originalRenderFn(state)
           subscribers.forEach((fn) => fn(xvalues))
           xvalues = null
           return v
@@ -63,9 +63,11 @@ export const define = (name, factory) => {
 
         this.prepend(frag)
 
-        setTimeout(() => {
-          config.render({ message: "goodbye!" })
-        }, 1000)
+        onChange(config.render)
+
+        // setTimeout(() => {
+        //   config.render({ message: "goodbye!" })
+        // }, 1000)
       }
     }
   )

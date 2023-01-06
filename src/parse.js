@@ -20,7 +20,23 @@ export const parse = (rootNode, subscribers = []) => {
         break
       }
       case node.ELEMENT_NODE: {
-        // @todo
+        let attrs = [...node.attributes] //.sort(compareAttributes)
+        let i = attrs.length
+        while (i--) {
+          let { name, value } = attrs[i]
+          if (hasMustache(value)) {
+            // @todo handle mutiple expression in single value
+            const i = +parseMustache(value)
+            let prevVal
+            subscribers.push((values) => {
+              const nextVal = values[i]
+              if (nextVal !== prevVal) {
+                node.setAttribute(name, nextVal)
+              }
+              prevVal = nextVal
+            })
+          }
+        }
         break
       }
     }

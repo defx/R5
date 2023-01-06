@@ -4,27 +4,8 @@ function reformat(str) {
   return str.replace(/\n|\s{2,}/g, "")
 }
 
-xdescribe("html()", () => {
-  it("replaces text and attribute interpolations with single placeholders", () => {
-    const classes = ["my1", "px2"]
-    const greeting = "hello world!"
-
-    const tpl = html`<p class="${classes}">${greeting}</p>`
-
-    assert.equal(tpl, `<p class="{{ 0 }}">{{ 1 }}</p>`)
-  })
-  it("replaces repeated blocks with a single placeholder", () => {
-    const items = [{ name: "kim" }, { name: "thea" }, { name: "ericka" }]
-
-    const tpl = html`<ul>
-      ${items.map(({ name }) => html`<li>${name}</li>`)}
-    </ul>`
-
-    assert.equal(reformat(tpl), `<ul>{{ 0 }}</ul>`)
-  })
-})
 describe("define()", () => {
-  it("...", async () => {
+  it("replaces text", async () => {
     define("x-foo", () => {
       return {
         state: {
@@ -36,5 +17,19 @@ describe("define()", () => {
     mount(`<x-foo></x-foo>`)
 
     assert.equal($(`x-foo p`).textContent, "hello!")
+  })
+  it("replaces attributes", async () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          foo: "mb1",
+        },
+        render: ({ foo }) => html`<p class="${foo}">hi!</p>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    assert.equal($(`${name} p`).getAttribute("class"), "mb1")
   })
 })
