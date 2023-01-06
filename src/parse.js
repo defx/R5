@@ -1,5 +1,5 @@
 import { walk } from "./helpers.js"
-import { hasMustache, parseMustache, getParts } from "./token.js"
+import { hasMustache, getParts } from "./token.js"
 
 export const parse = (rootNode, subscribers = []) => {
   walk(rootNode, (node) => {

@@ -6,8 +6,6 @@ const FUNCTION = 3
 
 export const hasMustache = (v) => v.match(/({{[^{}]+}})/)
 
-export const parseMustache = (v) => v.match(/{{([^{}]+)}}/)[1]?.trim()
-
 export const getParts = (value) =>
   value
     .trim()
