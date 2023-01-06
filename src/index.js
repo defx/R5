@@ -1,6 +1,6 @@
 import { configure } from "./store.js"
-import { fragmentFromTemplate, walk } from "./helpers.js"
-import { hasMustache, parseMustache } from "./token.js"
+import { fragmentFromTemplate } from "./helpers.js"
+import { parse } from "./parse.js"
 
 function _(value) {
   if (typeof value === "undefined") return ""
@@ -51,31 +51,7 @@ export const define = (name, factory) => {
           )
         )
         const frag = fragmentFromTemplate(content)
-
-        walk(frag.firstChild, (node) => {
-          switch (node.nodeType) {
-            case node.TEXT_NODE: {
-              let value = node.textContent
-              if (hasMustache(value)) {
-                const i = +parseMustache(value)
-                let prevVal
-                subscribers.push((values) => {
-                  const nextVal = values[i]
-                  if (nextVal !== prevVal) {
-                    node.textContent = nextVal
-                  }
-                  prevVal = nextVal
-                })
-              }
-              break
-            }
-            case node.ELEMENT_NODE: {
-              // @todo
-              break
-            }
-          }
-        })
-
+        const subscribers = parse(frag.firstChild)
         const originalRenderFn = config.render
 
         config.render = (state) => {
