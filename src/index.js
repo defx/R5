@@ -7,17 +7,30 @@ function _(value) {
   return String(Array.isArray(value) ? value.join("") : value)
 }
 
+// export const html = (strings, ...values) => {
+//   let c = 0
+//   let l = values.length
+
+//   const convert = () => {
+//     return `{{ ${c++} }}`
+//   }
+
+//   return strings
+//     .reduce((a, s, i) => {
+//       return a + s + (i < l ? convert() : ``)
+//     }, "")
+//     .trim()
+// }
+
+let xvalues
+
 export const html = (strings, ...values) => {
-  let c = 0
+  xvalues = values
+
   let l = values.length
-
-  const convert = () => {
-    return `{{ ${c++} }}`
-  }
-
   return strings
     .reduce((a, s, i) => {
-      return a + s + (i < l ? convert() : ``)
+      return a + s + (i < l ? values[i] : ``)
     }, "")
     .trim()
 }
@@ -35,14 +48,23 @@ export const define = (name, factory) => {
 
         if (config instanceof Promise) config = await config
 
+        let c = 0
+
         const { dispatch, getState, onChange, updated, refs } = configure(
           config,
           this
         )
 
-        let state = getState()
-
-        const content = config.render(state)
+        const content = config.render(
+          new Proxy(
+            {},
+            {
+              get() {
+                return `{{ ${c++} }}`
+              },
+            }
+          )
+        )
         const frag = fragmentFromTemplate(content)
 
         walk(frag.firstChild, (node) => {
@@ -68,6 +90,21 @@ export const define = (name, factory) => {
             }
           }
         })
+
+        const originalRenderFn = config.render
+        config.render = (state) => {
+          let v = originalRenderFn(state)
+          subscribers.forEach((fn) => fn(xvalues))
+          xvalues = null
+          return v
+        }
+
+        config.render(getState())
+        this.prepend(frag)
+
+        setTimeout(() => {
+          config.render({ message: "goodbye!" })
+        }, 1000)
       }
     }
   )

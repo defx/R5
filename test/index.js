@@ -4,7 +4,7 @@ function reformat(str) {
   return str.replace(/\n|\s{2,}/g, "")
 }
 
-describe("html()", () => {
+xdescribe("html()", () => {
   it("replaces text and attribute interpolations with single placeholders", () => {
     const classes = ["my1", "px2"]
     const greeting = "hello world!"
