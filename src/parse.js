@@ -1,6 +1,12 @@
 import { walk } from "./helpers.js"
 import { hasMustache, getParts } from "./token.js"
 
+function fromTemplate(str) {
+  let tpl = document.createElement("template")
+  tpl.innerHTML = str.trim()
+  return tpl.content.cloneNode(true)
+}
+
 export const parse = (rootNode, subscribers = []) => {
   walk(rootNode, (node) => {
     switch (node.nodeType) {

@@ -71,7 +71,7 @@ describe("define()", () => {
         state: {
           someClass: "xyz",
           //   items: [],
-          //   items: [{ name: "kim" }, { name: "thea" }, { name: "ericka" }],
+          items: [{ name: "kim" }, { name: "thea" }, { name: "ericka" }],
         },
         render: ({ items, someClass }) =>
           html`<ul class="${someClass}">

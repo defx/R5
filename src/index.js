@@ -11,23 +11,22 @@ function reformat(str) {
   return str.replace(/\n|\s{2,}/g, "")
 }
 
-const cache = {}
+let c = 0
 
 export const html = (strings, ...values) => {
   const k = strings.join("")
 
-  if (!(k in cache)) {
-    let l = values.length
-    const tpl = strings
-      .reduce((a, s, i) => {
-        return a + s + (i < l ? `{{ ${i} }}` : ``)
-      }, "")
-      .trim()
-    cache[k] = reformat(tpl)
-  }
+  let l = values.length
+  const tpl = strings
+    .reduce((a, s, i) => {
+      return a + s + (i < l ? `{{ ${c}.${i} }}` : ``)
+    }, "")
+    .trim()
+
+  c++
 
   return {
-    tpl: cache[k],
+    tpl: reformat(tpl),
     values,
   }
 }
@@ -48,9 +47,16 @@ export const define = (name, factory) => {
           this
         )
 
-        const x = config.render(getState())
+        const originalRender = config.render
 
-        console.log(x)
+        config.render = (x) => {
+          c = 0
+          return originalRender(x)
+        }
+
+        const blueprint = config.render(getState())
+
+        console.log(blueprint)
 
         // this.prepend(frag)
 
