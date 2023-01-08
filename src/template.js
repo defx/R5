@@ -35,19 +35,33 @@ function fromTemplate(str) {
   return tpl.content.cloneNode(true)
 }
 
-export const update = (blueprint) => {
+const cache = new WeakMap()
+
+function findParts(node) {
+  if (!cache.has(node) && hasMustache(node.textContent)) {
+    cache.set(node, getParts(node.textContent))
+  }
+  return cache.get(node)
+}
+
+function findNode(parentNode, template) {
+  if (!cache.has(parentNode)) {
+    const rootNode = fromTemplate(template)
+    cache.set(parentNode, rootNode)
+  }
+  return cache.get(parentNode)
+}
+
+export const update = (blueprint, parentNode) => {
   const { t, v } = blueprint
-  const rootNode = fromTemplate(t)
+  const rootNode = findNode(parentNode, t)
+
   walk(rootNode, (node) => {
     switch (node.nodeType) {
       case node.TEXT_NODE: {
-        let value = node.textContent
-        if (hasMustache(value)) {
-          // this could be a simple text node, but it could also be a placeholder for a dynamic block (if|each)...you'll need to check the values to figure that out. if its another blueprint then its a dynamic block.
-          //...it can also be mixed, as in some static text with a dynamic block in the middle, for example
-          // for the time being lets assume that there's no mixed static content with dynamic blocks
-          const parts = getParts(value)
+        const parts = findParts(node)
 
+        if (parts) {
           if (
             parts.every(
               ({ type, value }) => type === 1 || !isBlueprint(v[value])
@@ -56,9 +70,8 @@ export const update = (blueprint) => {
             const nextVal = parts.reduce((a, { type, value }) => {
               return a + (type === 1 ? value : v[value])
             }, "")
-            const prevVal = node.textContent
 
-            if (prevVal !== nextVal) {
+            if (node.textContent !== nextVal) {
               node.textContent = nextVal
             }
           }
@@ -78,7 +91,7 @@ export const update = (blueprint) => {
       }
     }
   })
-  return rootNode
+  parentNode.prepend(rootNode)
 }
 
 export const xparse = (rootNode, subscribers = []) => {

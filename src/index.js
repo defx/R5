@@ -35,9 +35,7 @@ export const define = (name, factory) => {
 
         console.log(JSON.stringify(blueprint, null, 2))
 
-        const node = update(blueprint)
-
-        this.prepend(node)
+        const node = update(blueprint, this)
 
         onChange(config.render)
       }
