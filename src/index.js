@@ -1,30 +1,12 @@
 import { configure } from "./store.js"
 import { fragmentFromTemplate } from "./helpers.js"
-import { parse } from "./parse.js"
+import { parse } from "./template.js"
+
+export { html } from "./template.js"
 
 function _(value) {
   if (typeof value === "undefined") return ""
   return String(Array.isArray(value) ? value.join("") : value)
-}
-
-function reformat(str) {
-  return str.replace(/\n|\s{2,}/g, "")
-}
-
-export const html = (strings, ...values) => {
-  const k = strings.join("")
-
-  let l = values.length
-  const tpl = strings
-    .reduce((a, s, i) => {
-      return a + s + (i < l ? `{{ ${i} }}` : ``)
-    }, "")
-    .trim()
-
-  return {
-    tpl: reformat(tpl),
-    values,
-  }
 }
 
 export const define = (name, factory) => {
