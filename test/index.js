@@ -17,7 +17,7 @@ describe("define()", () => {
     })
     mount(`<${name}></${name}>`)
 
-    assert.equal($(`p`).textContent, "hello!")
+    assert.equal($(`p`)?.textContent, "hello!")
   })
   it("replaces single attributes", async () => {
     const name = createName()

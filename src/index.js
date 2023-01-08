@@ -1,6 +1,6 @@
 import { configure } from "./store.js"
 import { fragmentFromTemplate } from "./helpers.js"
-import { parse } from "./template.js"
+import { update } from "./template.js"
 
 export { html } from "./template.js"
 
@@ -35,7 +35,9 @@ export const define = (name, factory) => {
 
         console.log(JSON.stringify(blueprint, null, 2))
 
-        // this.prepend(frag)
+        const node = update(blueprint)
+
+        this.prepend(node)
 
         onChange(config.render)
       }
