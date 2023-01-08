@@ -11,19 +11,15 @@ function reformat(str) {
   return str.replace(/\n|\s{2,}/g, "")
 }
 
-let c = 0
-
 export const html = (strings, ...values) => {
   const k = strings.join("")
 
   let l = values.length
   const tpl = strings
     .reduce((a, s, i) => {
-      return a + s + (i < l ? `{{ ${c}.${i} }}` : ``)
+      return a + s + (i < l ? `{{ ${i} }}` : ``)
     }, "")
     .trim()
-
-  c++
 
   return {
     tpl: reformat(tpl),
@@ -47,16 +43,15 @@ export const define = (name, factory) => {
           this
         )
 
-        const originalRender = config.render
+        // const originalRender = config.render
 
-        config.render = (x) => {
-          c = 0
-          return originalRender(x)
-        }
+        // config.render = (x) => {
+        //   return originalRender(x)
+        // }
 
         const blueprint = config.render(getState())
 
-        console.log(blueprint)
+        console.log(JSON.stringify(blueprint, null, 2))
 
         // this.prepend(frag)
 
