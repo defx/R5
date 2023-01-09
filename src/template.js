@@ -35,7 +35,7 @@ function asTemplate(str) {
   return tpl
 }
 
-function fromTemplate(str) {
+export function fromTemplate(str) {
   return asTemplate(str).content.cloneNode(true)
 }
 
@@ -110,9 +110,8 @@ function getTemplateKey(template) {
   }
 }
 
-export const update = (blueprint, parentNode) => {
+export const update = (blueprint, rootNode) => {
   const { t, v } = blueprint
-  const rootNode = findNode(parentNode, t)
 
   walk(rootNode, (node) => {
     switch (node.nodeType) {
@@ -193,54 +192,4 @@ export const update = (blueprint, parentNode) => {
       }
     }
   })
-  parentNode.prepend(rootNode)
-}
-
-export const xparse = (rootNode, subscribers = []) => {
-  walk(rootNode, (node) => {
-    switch (node.nodeType) {
-      case node.TEXT_NODE: {
-        let value = node.textContent
-        if (hasMustache(value)) {
-          const parts = getParts(value)
-          let prevVal
-          subscribers.push((values) => {
-            const nextVal = parts.reduce((a, { type, value }) => {
-              return a + (type === 1 ? value : values[value])
-            }, "")
-
-            if (nextVal !== prevVal) {
-              node.textContent = nextVal
-            }
-            prevVal = nextVal
-          })
-        }
-        break
-      }
-      case node.ELEMENT_NODE: {
-        let attrs = [...node.attributes]
-        let i = attrs.length
-        while (i--) {
-          let { name, value } = attrs[i]
-          if (hasMustache(value)) {
-            const parts = getParts(value)
-            let prevVal
-            subscribers.push((values) => {
-              const nextVal = parts.reduce((a, { type, value }) => {
-                return a + (type === 1 ? value : values[value])
-              }, "")
-
-              if (nextVal !== prevVal) {
-                node.setAttribute(name, nextVal)
-              }
-              prevVal = nextVal
-            })
-          }
-        }
-        break
-      }
-    }
-  })
-
-  return subscribers
 }

@@ -1,6 +1,6 @@
 import { configure } from "./store.js"
-import { fragmentFromTemplate } from "./helpers.js"
-import { update } from "./template.js"
+
+import { update, fromTemplate } from "./template.js"
 
 export { html } from "./template.js"
 
@@ -25,19 +25,17 @@ export const define = (name, factory) => {
           this
         )
 
-        // const originalRender = config.render
-
-        // config.render = (x) => {
-        //   return originalRender(x)
-        // }
-
         const blueprint = config.render(getState())
+        const rootNode = fromTemplate(blueprint.t)
 
-        // console.log(JSON.stringify(blueprint, null, 2))
+        update(blueprint, rootNode)
 
-        const node = update(blueprint, this)
+        this.prepend(rootNode)
 
-        onChange(config.render)
+        onChange((state) => {
+          const blueprint = config.render(state)
+          update(blueprint, rootNode)
+        })
       }
     }
   )
