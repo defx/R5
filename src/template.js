@@ -40,6 +40,7 @@ function fromTemplate(str) {
 }
 
 const cache = new WeakMap()
+const rbCache = new WeakMap()
 
 function findParts(node) {
   if (!cache.has(node) && hasMustache(node.textContent)) {
@@ -54,6 +55,16 @@ function findNode(parentNode, template) {
     cache.set(parentNode, rootNode)
   }
   return cache.get(parentNode)
+}
+
+function getTemplateKey(template) {
+  const node = template.content.firstElementChild
+  const k = node.getAttribute?.("@key")
+  if (k) {
+    const vi = +k.match(/{{([^{}]+)}}/)[1]
+    node.removeAttribute("@key")
+    return vi
+  }
 }
 
 export const update = (blueprint, parentNode) => {
@@ -73,8 +84,13 @@ export const update = (blueprint, parentNode) => {
           ) {
             // convert to template...
             const template = asTemplate(v[parts[0].value][0].t)
-            template.setAttribute("index", parts[0].value)
+            const key = getTemplateKey(template)
+            const index = parts[0].value
             node.parentNode.replaceChild(template, node)
+            rbCache.set(template, {
+              index,
+              key,
+            })
             return template
           }
 
@@ -90,7 +106,13 @@ export const update = (blueprint, parentNode) => {
       }
       case node.ELEMENT_NODE: {
         if (node.nodeName === "TEMPLATE") {
-          console.log("repeated block", node)
+          const { index, key, values } = rbCache.get(node)
+          console.log(
+            "repeated block",
+            node.innerHTML,
+            { index, key },
+            v[index].map(({ v }) => v)
+          )
           break
         }
 
