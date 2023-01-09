@@ -39,6 +39,49 @@ function fromTemplate(str) {
   return asTemplate(str).content.cloneNode(true)
 }
 
+const blockSize = (template) => {
+  let i = 0
+  walk(template.content?.firstChild || template.firstChild, () => i++, false)
+  return i
+}
+
+const elementSiblings = (node, n) => {
+  const siblings = []
+  let t = node
+  while (n--) {
+    const next = t.nextElementSibling
+    siblings.push(next)
+    t = next
+  }
+  return siblings
+}
+
+/*
+
+@mvp: just make it work for single top-level node first
+
+*/
+
+function listSync(template, delta) {
+  let n = +(template.dataset.length || 0)
+  const unchanged = delta.length === n && delta.every((a, b) => a == b)
+
+  if (unchanged) return
+
+  const blocks = elementSiblings(template, n)
+
+  let t = template
+
+  delta.forEach((i, newIndex) => {
+    let el = i === -1 ? template.content.cloneNode(true).firstChild : blocks[i]
+
+    t.after(el)
+    t = el
+  })
+
+  return t
+}
+
 const cache = new WeakMap()
 const rbCache = new WeakMap()
 
@@ -90,6 +133,7 @@ export const update = (blueprint, parentNode) => {
             rbCache.set(template, {
               index,
               key,
+              blockSize: blockSize(template),
             })
             return template
           }
@@ -106,14 +150,28 @@ export const update = (blueprint, parentNode) => {
       }
       case node.ELEMENT_NODE: {
         if (node.nodeName === "TEMPLATE") {
-          const { index, key, values } = rbCache.get(node)
-          console.log(
-            "repeated block",
-            node.innerHTML,
-            { index, key },
-            v[index].map(({ v }) => v)
-          )
-          break
+          const {
+            index,
+            key,
+            values: prevVals = [],
+            blockSize,
+          } = rbCache.get(node)
+
+          const nextVals = v[index].map(({ v }) => v)
+
+          if (key === undefined) {
+            console.warn("ignoring list without keys", node.innerHTML)
+            break
+          }
+
+          const prevKeys = prevVals.map((v) => v[key])
+          const nextKeys = nextVals.map((v) => v[key])
+          const delta = nextKeys.map((b) => prevKeys.findIndex((a) => a === b))
+          const lastNode = listSync(node, delta)
+
+          rbCache.set(node, { index, key, values: nextVals })
+
+          return lastNode.nextSibling
         }
 
         let attrs = [...node.attributes]

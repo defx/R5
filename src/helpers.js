@@ -12,11 +12,9 @@ export const isWhitespace = (node) => {
 
 export const walk = (node, callback, deep = true) => {
   if (!node) return
-  // if (node.matches?.(`script[type="application/synergy"]`))
-  //   return walk(node.nextSibling, callback, deep)
   if (!isWhitespace(node)) {
     let v = callback(node)
-    if (v === false) return
+    if (v === false || v === null) return
     if (v?.nodeName) return walk(v, callback, deep)
   }
   if (deep) walk(node.firstChild, callback, deep)
