@@ -83,8 +83,14 @@ export const update = (blueprint, parentNode) => {
         let i = attrs.length
         while (i--) {
           let { name, value } = attrs[i]
-          if (hasMustache(value)) {
-            const parts = getParts(value)
+          const parts = getParts(value)
+          if (parts) {
+            const nextVal = parts.reduce((a, { type, value }) => {
+              return a + (type === 1 ? value : v[value])
+            }, "")
+            if (node.getAttribute(name) !== nextVal) {
+              node.setAttribute(name, nextVal)
+            }
           }
         }
         break
