@@ -29,10 +29,14 @@ function isBlueprint(v) {
   return blueprints.has(v)
 }
 
-function fromTemplate(str) {
+function asTemplate(str) {
   let tpl = document.createElement("template")
   tpl.innerHTML = str.trim()
-  return tpl.content.cloneNode(true)
+  return tpl
+}
+
+function fromTemplate(str) {
+  return asTemplate(str).content.cloneNode(true)
 }
 
 const cache = new WeakMap()
@@ -63,26 +67,38 @@ export const update = (blueprint, parentNode) => {
 
         if (parts) {
           if (
-            parts.every(
-              ({ type, value }) => type === 1 || !isBlueprint(v[value])
+            parts.some(
+              ({ value: i }) => Array.isArray(v[i]) && v[i].some(isBlueprint)
             )
           ) {
-            const nextVal = parts.reduce((a, { type, value }) => {
-              return a + (type === 1 ? value : v[value])
-            }, "")
+            // convert to template...
+            const template = asTemplate(v[parts[0].value][0].t)
+            template.setAttribute("index", parts[0].value)
+            node.parentNode.replaceChild(template, node)
+            return template
+          }
 
-            if (node.textContent !== nextVal) {
-              node.textContent = nextVal
-            }
+          const nextVal = parts.reduce((a, { type, value }) => {
+            return a + (type === 1 ? value : v[value])
+          }, "")
+
+          if (node.textContent !== nextVal) {
+            node.textContent = nextVal
           }
         }
         break
       }
       case node.ELEMENT_NODE: {
+        if (node.nodeName === "TEMPLATE") {
+          console.log("repeated block", node)
+          break
+        }
+
         let attrs = [...node.attributes]
         let i = attrs.length
         while (i--) {
           let { name, value } = attrs[i]
+
           const parts = getParts(value)
           if (parts) {
             const nextVal = parts.reduce((a, { type, value }) => {

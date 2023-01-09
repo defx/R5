@@ -71,11 +71,15 @@ describe("define()", () => {
         state: {
           someClass: "xyz",
           //   items: [],
-          items: [{ name: "kim" }, { name: "thea" }, { name: "ericka" }],
+          items: [
+            { id: 1, name: "kim" },
+            { id: 2, name: "thea" },
+            { id: 3, name: "ericka" },
+          ],
         },
         render: ({ items, someClass }) =>
           html`<ul class="${someClass}">
-            ${items?.map(({ name }) => html`<li>${name}</li>`)}
+            ${items?.map(({ id, name }) => html`<li @key="${id}">${name}</li>`)}
           </ul>`,
       }
     })

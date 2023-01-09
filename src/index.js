@@ -33,7 +33,7 @@ export const define = (name, factory) => {
 
         const blueprint = config.render(getState())
 
-        console.log(JSON.stringify(blueprint, null, 2))
+        // console.log(JSON.stringify(blueprint, null, 2))
 
         const node = update(blueprint, this)
 
