@@ -92,14 +92,6 @@ function findParts(node) {
   return cache.get(node)
 }
 
-function findNode(parentNode, template) {
-  if (!cache.has(parentNode)) {
-    const rootNode = fromTemplate(template)
-    cache.set(parentNode, rootNode)
-  }
-  return cache.get(parentNode)
-}
-
 function getTemplateKey(template) {
   const node = template.content.firstElementChild
   const k = node.getAttribute?.("@key")
@@ -167,6 +159,9 @@ export const update = (blueprint, rootNode) => {
           const nextKeys = nextVals.map((v) => v[key])
           const delta = nextKeys.map((b) => prevKeys.findIndex((a) => a === b))
           const lastNode = listSync(node, delta)
+          const listItems = elementSiblings(node, delta.length)
+
+          listItems.forEach((listItem, i) => update(v[index][i], listItem))
 
           rbCache.set(node, { index, key, values: nextVals })
 
