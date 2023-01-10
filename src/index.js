@@ -1,13 +1,7 @@
 import { configure } from "./store.js"
-
 import { update, fromTemplate } from "./template.js"
 
 export { html } from "./template.js"
-
-function _(value) {
-  if (typeof value === "undefined") return ""
-  return String(Array.isArray(value) ? value.join("") : value)
-}
 
 export const define = (name, factory) => {
   if (customElements?.get(name)) return
