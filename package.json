@@ -6,12 +6,20 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha-express --coverage",
-    "test:watch": "mocha-express --watch"
+    "test:watch": "mocha-express --watch",
+    "build": "rm -rf dist && rollup -c && npm run size",
+    "size": "gzip -c9 ./dist/synergy.min.js | wc -c",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "prepublish": "npm t && npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "mocha-express": "^0.1.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.3.0",
+    "rollup": "^3.9.1"
   }
 }
