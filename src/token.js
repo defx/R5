@@ -17,10 +17,8 @@ export const getParts = (value) =>
           value,
         }
 
-      value = +match[1].trim()
-
       return {
         type: KEY,
-        value,
+        value: match[1].trim(),
       }
     })

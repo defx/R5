@@ -1,4 +1,4 @@
-import { walk } from "./helpers.js"
+import { last, walk } from "./helpers.js"
 import { hasMustache, getParts } from "./token.js"
 
 function reformat(str) {
@@ -127,10 +127,6 @@ function getTemplateKey(template) {
     node.removeAttribute("@key")
     return vi
   }
-}
-
-function last(v) {
-  return v[v.length - 1]
 }
 
 export const update = (blueprint, rootNode) => {
