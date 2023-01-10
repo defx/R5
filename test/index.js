@@ -165,11 +165,11 @@ describe("define()", () => {
     define(name, () => {
       return {
         state: {
-          items: [
-            { id: 1, name: "kim", age: 36 },
-            { id: 2, name: "thea", age: 8 },
-            { id: 3, name: "ericka", age: 5 },
-          ],
+          // items: [
+          //   { id: 1, name: "kim", age: 36 },
+          //   { id: 2, name: "thea", age: 8 },
+          //   { id: 3, name: "ericka", age: 5 },
+          // ],
         },
         update: {
           set: (_, { payload }) => {
@@ -186,6 +186,8 @@ describe("define()", () => {
       }
     })
     mount(`<${name}></${name}>`)
+
+    assert.equal($(name).innerHTML, `<ul></ul>`)
 
     $(name).$dispatch({
       type: "set",
