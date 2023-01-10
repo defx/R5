@@ -56,12 +56,6 @@ const elementSiblings = (node, n) => {
   return siblings
 }
 
-/*
-
-@mvp: just make it work for single top-level node first
-
-*/
-
 function listSync(template, delta) {
   let n = +(template.dataset.length || 0)
   const unchanged = delta.length === n && delta.every((a, b) => a == b)
@@ -78,6 +72,8 @@ function listSync(template, delta) {
     t.after(el)
     t = el
   })
+
+  template.dataset.length = delta.length
 
   return t
 }

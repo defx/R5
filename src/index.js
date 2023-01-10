@@ -26,16 +26,19 @@ export const define = (name, factory) => {
         )
 
         const blueprint = config.render(getState())
-        const rootNode = fromTemplate(blueprint.t)
+        const frag = fromTemplate(blueprint.t)
+        const rootNode = frag.firstChild
 
         update(blueprint, rootNode)
 
-        this.prepend(rootNode)
+        this.prepend(frag)
 
         onChange((state) => {
           const blueprint = config.render(state)
           update(blueprint, rootNode)
         })
+
+        this.$dispatch = dispatch
       }
     }
   )

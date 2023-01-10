@@ -86,4 +86,65 @@ describe("define()", () => {
       ["kim", "thea", "ericka"]
     )
   })
+
+  it("transitions", () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          items: [
+            { id: 1, name: "kim", age: 36 },
+            { id: 2, name: "thea", age: 8 },
+            { id: 3, name: "ericka", age: 5 },
+          ],
+        },
+        update: {
+          set: (_, { payload }) => {
+            return payload
+          },
+        },
+        render: ({ items }) =>
+          html`<ul>
+            ${items?.map(
+              ({ id, name, age }) =>
+                html`<li @key="${id}">${name} (${age})</li>`
+            )}
+          </ul>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    $(name).$dispatch({
+      type: "set",
+      payload: {
+        items: [
+          { id: 1, name: "kim", age: 36 },
+          { id: 2, name: "thea", age: 8 },
+          { id: 3, name: "ericka", age: 5 },
+        ].sort((a, b) => a.age - b.age),
+      },
+    })
+
+    assert.deepEqual(
+      $$(`li`).map((v) => v.textContent),
+      ["ericka (5)", "thea (8)", "kim (36)"]
+    )
+
+    $(name).$dispatch({
+      type: "set",
+      payload: {
+        items: [
+          { id: 0, name: "matt", age: 39 },
+          { id: 1, name: "kim", age: 36 },
+          { id: 2, name: "thea", age: 8 },
+          { id: 3, name: "ericka", age: 5 },
+        ].sort((a, b) => b.age - a.age),
+      },
+    })
+
+    assert.deepEqual(
+      $$(`li`).map((v) => v.textContent),
+      ["matt (39)", "kim (36)", "thea (8)", "ericka (5)"]
+    )
+  })
 })
