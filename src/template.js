@@ -32,7 +32,7 @@ function isBlueprint(v) {
 function asTemplate(str) {
   let tpl = document.createElement("template")
   tpl.innerHTML = str.trim()
-  if (tpl.content.firstElementChild.nodeName === "TEMPLATE") {
+  if (tpl.content.firstElementChild?.nodeName === "TEMPLATE") {
     return tpl.content.firstElementChild
   }
   return tpl
@@ -108,6 +108,7 @@ function listSync(template, delta, blockSize) {
 
 const cache = new WeakMap()
 const rbCache = new WeakMap()
+const placeholderCache = new WeakMap()
 
 function findParts(node) {
   if (!cache.has(node) && hasMustache(node.textContent)) {
@@ -129,6 +130,21 @@ function getTemplateKey(template) {
   }
 }
 
+function blockTemplate(node, v, i) {
+  // convert to template...
+  const template = asTemplate(v[i][0].t)
+  const key = getTemplateKey(template)
+  const index = i
+  node.parentNode.replaceChild(template, node)
+
+  rbCache.set(template, {
+    index,
+    key,
+    blockSize: blockSize(template),
+  })
+  return template
+}
+
 export const update = (blueprint, rootNode) => {
   const { t, v } = blueprint
 
@@ -137,24 +153,24 @@ export const update = (blueprint, rootNode) => {
       case node.TEXT_NODE: {
         const parts = findParts(node)
 
+        if (parts?.length === 1 && parts[0].type === 2) {
+          const x = v[parts[0].value]
+          if (isNaN(x) && (!x || x.length === 0)) {
+            const template = asTemplate(``)
+            const index = parts[0].value
+            node.parentNode.replaceChild(template, node)
+            placeholderCache.set(template, { index })
+            return template.nextSibling
+          }
+        }
+
         if (parts) {
           if (
             parts.some(
               ({ value: i }) => Array.isArray(v[i]) && v[i].some(isBlueprint)
             )
           ) {
-            // convert to template...
-            const template = asTemplate(v[parts[0].value][0].t)
-            const key = getTemplateKey(template)
-            const index = parts[0].value
-            node.parentNode.replaceChild(template, node)
-
-            rbCache.set(template, {
-              index,
-              key,
-              blockSize: blockSize(template),
-            })
-            return template
+            return blockTemplate(node, v, parts[0].value)
           }
 
           const nextVal = parts.reduce((a, { type, value }) => {
@@ -169,6 +185,15 @@ export const update = (blueprint, rootNode) => {
       }
       case node.ELEMENT_NODE: {
         if (node.nodeName === "TEMPLATE") {
+          const pEntry = placeholderCache.get(node)
+
+          if (pEntry) {
+            // upgrade placeholder to block template
+            const template = blockTemplate(node, v, pEntry.index)
+            placeholderCache.delete(node)
+            return template
+          }
+
           const cacheEntry = rbCache.get(node)
           const { index, key, values: prevVals = [], blockSize } = cacheEntry
 

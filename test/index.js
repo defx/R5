@@ -187,7 +187,7 @@ describe("define()", () => {
     })
     mount(`<${name}></${name}>`)
 
-    assert.equal($(name).innerHTML, `<ul></ul>`)
+    assert.equal($(name).innerHTML, `<ul><template></template></ul>`)
 
     $(name).$dispatch({
       type: "set",
