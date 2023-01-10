@@ -246,5 +246,7 @@ describe("define()", () => {
       }
     })
     mount(`<${name}></${name}>`)
+
+    $(name).$dispatch({ type: "set", payload: { showBlock: true } })
   })
 })
