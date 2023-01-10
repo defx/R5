@@ -94,18 +94,28 @@ describe("define()", () => {
         state: {
           items: [
             {
+              id: 0,
               term: "Beast of Bodmin",
               description: "A large feline inhabiting Bodmin Moor.",
             },
-            { term: "Morgawr", description: "A sea serpent." },
-            { term: "Owlman", description: "A giant owl-like creature." },
+            { id: 1, term: "Morgawr", description: "A sea serpent." },
+            {
+              id: 2,
+              term: "Owlman",
+              description: "A giant owl-like creature.",
+            },
           ],
+        },
+        update: {
+          set: (_, { payload }) => {
+            return payload
+          },
         },
         render: ({ items }) =>
           html`<dl>
             ${items?.map(
-              ({ term, description }, i) => html`
-                <template @key="${i}">
+              ({ id, term, description }) => html`
+                <template @key="${id}">
                   <dt>${term}</dt>
                   <dd>${description}</dd>
                 </template>
@@ -116,11 +126,38 @@ describe("define()", () => {
     })
     mount(`<${name}></${name}>`)
 
-    // assert.equal($$(`li`).length, 3)
-    // assert.deepEqual(
-    //   $$(`li`).map((v) => v.textContent),
-    //   ["kim", "thea", "ericka"]
-    // )
+    assert.ok(
+      $(name).innerHTML.includes(
+        `<dt>Beast of Bodmin</dt><dd>A large feline inhabiting Bodmin Moor.</dd><dt>Morgawr</dt><dd>A sea serpent.</dd><dt>Owlman</dt><dd>A giant owl-like creature.</dd></dl>`
+      )
+    )
+
+    $(name).$dispatch({
+      type: "set",
+      payload: {
+        items: [
+          {
+            id: 3,
+            term: "The Harpenden Hakutaku",
+            description:
+              "A talking beast which handed down knowledge on harmful spirits",
+          },
+          {
+            id: 0,
+            term: "Beast of Bodmin",
+            description: "A large feline inhabiting Bodmin Moor.",
+          },
+          { id: 2, term: "Owlman", description: "A giant owl-like creature." },
+          { id: 1, term: "Morgawr", description: "A sea serpent." },
+        ],
+      },
+    })
+
+    assert.ok(
+      $(name).innerHTML.includes(
+        `<dt>The Harpenden Hakutaku</dt><dd>A talking beast which handed down knowledge on harmful spirits</dd><dt>Beast of Bodmin</dt><dd>A large feline inhabiting Bodmin Moor.</dd><dt>Owlman</dt><dd>A giant owl-like creature.</dd><dt>Morgawr</dt><dd>A sea serpent.</dd></dl>`
+      )
+    )
   })
 
   it("transitions", () => {
