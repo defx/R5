@@ -1,24 +1,3 @@
-import { setValueAtPath } from "./helpers.js"
-
-function systemReducer(state, action) {
-  switch (action.type) {
-    case "SET": {
-      const { name, value } = action.payload
-
-      let o = { ...state }
-      setValueAtPath(name, value, o)
-
-      return o
-    }
-    case "MERGE": {
-      return {
-        ...state,
-        ...action.payload,
-      }
-    }
-  }
-}
-
 export function configure({
   update = {},
   middleware = [],
@@ -58,8 +37,8 @@ export function configure({
   function dispatch(action) {
     const { type } = action
 
-    if (type === "SET" || type === "MERGE") {
-      updateState(systemReducer(getState(), action))
+    if (type === "MERGE") {
+      updateState({ ...getState(), ...action.payload })
     } else {
       const done = (action) => {
         if (action.type in update) {

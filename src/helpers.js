@@ -55,25 +55,6 @@ export const getValueAtPath = (path, target) => {
   return v
 }
 
-export const setValueAtPath = (path, value, target) => {
-  let [a, b] = getTarget(path, target)
-  return (a[b] = value)
-}
-
-export const fragmentFromTemplate = (v) => {
-  if (typeof v === "string") {
-    if (v.charAt(0) === "#") {
-      v = document.querySelector(v)
-    } else {
-      let tpl = document.createElement("template")
-      tpl.innerHTML = v.trim()
-      return tpl.content.cloneNode(true)
-    }
-  }
-  if (v.nodeName === "TEMPLATE") return v.cloneNode(true).content
-  if (v.nodeName === "defs") return v.firstElementChild.cloneNode(true)
-}
-
 export const debounce = (fn) => {
   let wait = false
   let invoke = false
@@ -89,64 +70,4 @@ export const debounce = (fn) => {
       })
     }
   }
-}
-
-export const isPrimitive = (v) => v === null || typeof v !== "object"
-
-export const typeOf = (v) =>
-  Object.prototype.toString.call(v).match(/\s(.+[^\]])/)[1]
-
-export const pascalToKebab = (string) =>
-  string.replace(/[\w]([A-Z])/g, function (m) {
-    return m[0] + "-" + m[1].toLowerCase()
-  })
-
-export const kebabToPascal = (string) =>
-  string.replace(/[\w]-([\w])/g, function (m) {
-    return m[0] + m[2].toUpperCase()
-  })
-
-export const applyAttribute = (node, name, value) => {
-  name = pascalToKebab(name)
-
-  if (typeof value === "boolean") {
-    if (name.startsWith("aria-")) {
-      value = "" + value
-    } else if (value) {
-      value = ""
-    }
-  }
-
-  if (typeof value === "string" || typeof value === "number") {
-    node.setAttribute(name, value)
-  } else {
-    node.removeAttribute(name)
-  }
-}
-
-export const attributeToProp = (k, v) => {
-  let name = kebabToPascal(k)
-  if (v === "") v = true
-  if (k.startsWith("aria-")) {
-    if (v === "true") v = true
-    if (v === "false") v = false
-  }
-  return {
-    name,
-    value: v,
-  }
-}
-
-export function getDataScript(node) {
-  return node.querySelector(
-    `script[type="application/synergy"][id="${node.nodeName}"]`
-  )
-}
-
-export function createDataScript(node) {
-  let ds = document.createElement("script")
-  ds.setAttribute("type", "application/synergy")
-  ds.setAttribute("id", node.nodeName)
-  node.append(ds)
-  return ds
 }
