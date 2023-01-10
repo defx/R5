@@ -155,7 +155,7 @@ export const update = (blueprint, rootNode) => {
 
         if (parts?.length === 1 && parts[0].type === 2) {
           const x = v[parts[0].value]
-          if (isNaN(x) && (!x || x.length === 0)) {
+          if (!x || x.length === 0) {
             const template = asTemplate(``)
             const index = parts[0].value
             node.parentNode.replaceChild(template, node)

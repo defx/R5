@@ -164,13 +164,7 @@ describe("define()", () => {
     const name = createName()
     define(name, () => {
       return {
-        state: {
-          // items: [
-          //   { id: 1, name: "kim", age: 36 },
-          //   { id: 2, name: "thea", age: 8 },
-          //   { id: 3, name: "ericka", age: 5 },
-          // ],
-        },
+        state: {},
         update: {
           set: (_, { payload }) => {
             return payload
@@ -221,5 +215,36 @@ describe("define()", () => {
       $$(`li`).map((v) => v.textContent),
       ["matt (39)", "kim (36)", "thea (8)", "ericka (5)"]
     )
+  })
+
+  it("conditional blocks", () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          showBlock: false,
+        },
+        update: {
+          set: (_, { payload }) => {
+            return payload
+          },
+        },
+        render: ({ showBlock }) =>
+          html`<p>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sit
+              debitis ullam, tenetur voluptas quisquam eveniet, illo corrupti
+              optio praesentium hic quidem magni quam harum animi, adipisci eos
+              ipsa nobis. Expedita?
+            </p>
+            ${showBlock && html` <h1>hello! 👋</h1> `}
+            <p>
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sit
+              debitis ullam, tenetur voluptas quisquam eveniet, illo corrupti
+              optio praesentium hic quidem magni quam harum animi, adipisci eos
+              ipsa nobis. Expedita?
+            </p>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
   })
 })
