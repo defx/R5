@@ -60,7 +60,7 @@ describe("define()", () => {
     assert.equal($(`p`).textContent, "frankie says hello!")
   })
 
-  it("manages repeated blocks", async () => {
+  it("repeated blocks", async () => {
     const name = createName()
     define(name, () => {
       return {
@@ -85,6 +85,42 @@ describe("define()", () => {
       $$(`li`).map((v) => v.textContent),
       ["kim", "thea", "ericka"]
     )
+  })
+
+  it("repeated blocks (multiple top-level nodes)", async () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          items: [
+            {
+              term: "Beast of Bodmin",
+              description: "A large feline inhabiting Bodmin Moor.",
+            },
+            { term: "Morgawr", description: "A sea serpent." },
+            { term: "Owlman", description: "A giant owl-like creature." },
+          ],
+        },
+        render: ({ items }) =>
+          html`<dl>
+            ${items?.map(
+              ({ term, description }, i) => html`
+                <template @key="${i}">
+                  <dt>${term}</dt>
+                  <dd>${description}</dd>
+                </template>
+              `
+            )}
+          </dl>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    // assert.equal($$(`li`).length, 3)
+    // assert.deepEqual(
+    //   $$(`li`).map((v) => v.textContent),
+    //   ["kim", "thea", "ericka"]
+    // )
   })
 
   it("transitions", () => {

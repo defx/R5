@@ -32,6 +32,9 @@ function isBlueprint(v) {
 function asTemplate(str) {
   let tpl = document.createElement("template")
   tpl.innerHTML = str.trim()
+  if (tpl.content.firstElementChild.nodeName === "TEMPLATE") {
+    return tpl.content.firstElementChild
+  }
   return tpl
 }
 
@@ -56,7 +59,15 @@ const elementSiblings = (node, n) => {
   return siblings
 }
 
-function listSync(template, delta) {
+function lastChild(v) {
+  return (v.nodeType === v.DOCUMENT_FRAGMENT_NODE && v.lastChild) || v
+}
+
+function firstChild(v) {
+  return (v.nodeType === v.DOCUMENT_FRAGMENT_NODE && v.firstChild) || v
+}
+
+function listSync(template, delta, blockSize) {
   let n = +(template.dataset.length || 0)
   const unchanged = delta.length === n && delta.every((a, b) => a == b)
 
@@ -67,10 +78,12 @@ function listSync(template, delta) {
   let t = template
 
   delta.forEach((i, newIndex) => {
-    let el = i === -1 ? template.content.cloneNode(true).firstChild : blocks[i]
-
-    t.after(el)
-    t = el
+    let el = i === -1 ? template.content.cloneNode(true) : blocks[i]
+    let x = lastChild(el)
+    if (t.nextElementSibling !== firstChild(el)) {
+      t.after(el)
+    }
+    t = x
   })
 
   template.dataset.length = delta.length
@@ -89,7 +102,10 @@ function findParts(node) {
 }
 
 function getTemplateKey(template) {
-  const node = template.content.firstElementChild
+  const node = template.hasAttribute("@key")
+    ? template
+    : template.content.firstElementChild
+
   const k = node.getAttribute?.("@key")
   if (k) {
     const vi = +k.match(/{{([^{}]+)}}/)[1]
@@ -117,6 +133,7 @@ export const update = (blueprint, rootNode) => {
             const key = getTemplateKey(template)
             const index = parts[0].value
             node.parentNode.replaceChild(template, node)
+
             rbCache.set(template, {
               index,
               key,
@@ -154,7 +171,7 @@ export const update = (blueprint, rootNode) => {
           const prevKeys = prevVals.map((v) => v[key])
           const nextKeys = nextVals.map((v) => v[key])
           const delta = nextKeys.map((b) => prevKeys.findIndex((a) => a === b))
-          const lastNode = listSync(node, delta)
+          const lastNode = listSync(node, delta, blockSize)
           const listItems = elementSiblings(node, delta.length)
 
           listItems.forEach((listItem, i) => update(v[index][i], listItem))
