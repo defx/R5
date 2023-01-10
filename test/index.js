@@ -85,16 +85,10 @@ describe("define()", () => {
     })
     mount(`<${name}></${name}>`)
 
-    /*
-
-    1.
-    
-    <ul>{{ 0 }}</ul>
-
-    2.      
-
-    <li>{{ 0 }}</li>
-    
-    */
+    assert.equal($$(`li`).length, 3)
+    assert.deepEqual(
+      $$(`li`).map((v) => v.textContent),
+      ["kim", "thea", "ericka"]
+    )
   })
 })
