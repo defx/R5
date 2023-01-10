@@ -1,9 +1,5 @@
 import { define, html } from "../src/index.js"
 
-function reformat(str) {
-  return str.replace(/\n|\s{2,}/g, "")
-}
-
 describe("define()", () => {
   it("replaces text", async () => {
     const name = createName()
@@ -70,7 +66,6 @@ describe("define()", () => {
       return {
         state: {
           someClass: "xyz",
-          //   items: [],
           items: [
             { id: 1, name: "kim" },
             { id: 2, name: "thea" },
