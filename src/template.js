@@ -160,7 +160,7 @@ export const update = (blueprint, rootNode) => {
             const index = parts[0].value
             node.parentNode.replaceChild(template, node)
             placeholderCache.set(template, { index })
-            console.log("creating placeholder template...")
+            // console.log("creating placeholder template...")
             return template.nextSibling
           }
         }
@@ -191,7 +191,7 @@ export const update = (blueprint, rootNode) => {
           if (pEntry) {
             if (!v[pEntry.index]) return node.nextSibling
 
-            console.log("upgrading placeholder...", v[pEntry.index])
+            // console.log("upgrading placeholder...", v[pEntry.index])
             const template = blockTemplate(node, v, pEntry.index)
 
             placeholderCache.delete(node)
@@ -235,8 +235,25 @@ export const update = (blueprint, rootNode) => {
 
             return last(last(listItems))?.nextSibling
           } else {
-            console.log("render conditional block...", node, value)
-            // update(value, node)
+            // console.log("render conditional block...", node, value)
+
+            const shouldRender = !!value
+            const attached = node.getAttribute("attached") === "true"
+            const { blockSize } = cacheEntry
+
+            if (shouldRender !== attached) {
+              if (shouldRender) {
+                const n = fromTemplate(value.t)
+                update(value.v, n)
+                node.after(n)
+              } else {
+                elementSiblings(node, 1, blockSize)[0].forEach((el) =>
+                  el.remove()
+                )
+              }
+            }
+
+            node.setAttribute("attached", shouldRender)
           }
         }
 
