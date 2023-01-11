@@ -160,6 +160,7 @@ export const update = (blueprint, rootNode) => {
             const index = parts[0].value
             node.parentNode.replaceChild(template, node)
             placeholderCache.set(template, { index })
+            console.log("creating placeholder template...")
             return template.nextSibling
           }
         }
@@ -188,7 +189,11 @@ export const update = (blueprint, rootNode) => {
           const pEntry = placeholderCache.get(node)
 
           if (pEntry) {
+            if (!v[pEntry.index]) return node.nextSibling
+
+            console.log("upgrading placeholder...", v[pEntry.index])
             const template = blockTemplate(node, v, pEntry.index)
+
             placeholderCache.delete(node)
             return template
           }
@@ -230,7 +235,8 @@ export const update = (blueprint, rootNode) => {
 
             return last(last(listItems))?.nextSibling
           } else {
-            console.log("render conditional block...", node)
+            console.log("render conditional block...", node, value)
+            // update(value, node)
           }
         }
 
