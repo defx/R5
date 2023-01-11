@@ -132,7 +132,7 @@ function getTemplateKey(template) {
 
 function blockTemplate(node, v, i) {
   // convert to template...
-  const template = asTemplate(v[i][0].t)
+  const template = asTemplate(v[i].t || v[i][0].t)
   const key = getTemplateKey(template)
   const index = i
   node.parentNode.replaceChild(template, node)
@@ -188,43 +188,50 @@ export const update = (blueprint, rootNode) => {
           const pEntry = placeholderCache.get(node)
 
           if (pEntry) {
-            // upgrade placeholder to block template
             const template = blockTemplate(node, v, pEntry.index)
             placeholderCache.delete(node)
             return template
           }
 
           const cacheEntry = rbCache.get(node)
-          const { index, key, values: prevVals = [], blockSize } = cacheEntry
+          const value = v[cacheEntry.index]
 
-          const nextVals = v[index].map(({ v }) => v)
+          if (Array.isArray(value)) {
+            const { index, key, values: prevVals = [], blockSize } = cacheEntry
 
-          if (key === undefined) {
-            console.warn("ignoring list without keys", node.innerHTML)
-            break
-          }
+            const nextVals = v[index].map(({ v }) => v)
 
-          const prevKeys = prevVals.map((v) => v[key])
-          const nextKeys = nextVals.map((v) => v[key])
+            if (key === undefined) {
+              console.warn("ignoring list without keys", node.innerHTML)
+              break
+            }
 
-          if (nextKeys.some((v) => v === undefined)) {
-            console.warn(
-              `You are trying to re-render a list but one or more of your list keys are undefined!`
+            const prevKeys = prevVals.map((v) => v[key])
+            const nextKeys = nextVals.map((v) => v[key])
+
+            if (nextKeys.some((v) => v === undefined)) {
+              console.warn(
+                `You are trying to re-render a list but one or more of your list keys are undefined!`
+              )
+              return false
+            }
+
+            const delta = nextKeys.map((b) =>
+              prevKeys.findIndex((a) => a === b)
             )
-            return false
+            listSync(node, delta, blockSize)
+            const listItems = elementSiblings(node, delta.length, blockSize)
+
+            listItems.forEach((items, i) =>
+              items.forEach((item) => update(v[index][i], item))
+            )
+
+            rbCache.set(node, { ...cacheEntry, values: nextVals })
+
+            return last(last(listItems))?.nextSibling
+          } else {
+            console.log("render conditional block...", node)
           }
-
-          const delta = nextKeys.map((b) => prevKeys.findIndex((a) => a === b))
-          listSync(node, delta, blockSize)
-          const listItems = elementSiblings(node, delta.length, blockSize)
-
-          listItems.forEach((items, i) =>
-            items.forEach((item) => update(v[index][i], item))
-          )
-
-          rbCache.set(node, { ...cacheEntry, values: nextVals })
-
-          return last(last(listItems))?.nextSibling
         }
 
         let attrs = [...node.attributes]
