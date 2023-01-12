@@ -131,9 +131,6 @@ function getTemplateKey(template) {
 }
 
 function blockTemplate(node, v, i) {
-  console.log(node, v, i)
-
-  // convert to template...
   const template = asTemplate(v[i].t || v[i][0].t)
   const key = getTemplateKey(template)
   const index = i
@@ -153,70 +150,56 @@ export const update = (blueprint, rootNode) => {
   walk(rootNode, (node) => {
     switch (node.nodeType) {
       case node.TEXT_NODE: {
-        const parts = findParts(node)
+        let parts = findParts(node)
 
-        console.log(parts)
+        if (!parts) break
 
-        /*
-        
-        
-        we need to look at the parts together...
+        for (const [i, part] of Object.entries(parts)) {
+          if (!isBlueprint(v[part.value]?.[0] || v[part.value])) continue
 
-        there are only two types (1 and 2)
+          let newParts
 
-        1 = string
-        2 = value
-
-        the main complication is when a value is falsy, then we don't yet know what goes in that "slot". for example, it could be a string that just isn't initialised, but it could also be a nested block. 
-
-        when we have a single value that is falsy (or an empty array), then we simply replace the text node with a placeholder template. 
-        
-        in actual fact, this could also turn out just to be a string once initialised, so we need to be able to handle that scenario.
-
-        when the html function is invoked, and values are replaced with interpolation placeholders with an index to identify which value goes there. (e.g., "{{ 1 }}")
-
-
-        if a value occurs next to a text string in the template, then it will be a part of the same text node when we first convert it into a DOM tree.
-
-        when we parse such a text node, it is clear that we have multiple parts, however in the case of falsy values, we can't be sure what these values are yet. one thing we can say about this situation is that there is definitely a static string that can be rendered. 
-
-        the first thing we must do is render any static strings or non-falsy values. probably the simplest way to do this is take the parts as far as we can (until there is a falsy value that we don't understand), and then split the parts, render the text node, and use the remaining parts with a new template placeholder and continue walking the DOM from there. we would also need to ensure that any static / non-falsy values following the placeholder also get their own parts/nodes.
-
-        ok this is starting to make a little more sense in my mind now. i think we just need to iterate over the parts and be ready to split before / after a falsy value OR a block. 
-        
-        
-        */
-
-        if (parts?.length === 1 && parts[0].type === 2) {
-          const x = v[parts[0].value]
-          if (!x || x.length === 0) {
-            const template = asTemplate(``)
-            const index = parts[0].value
-            node.parentNode.replaceChild(template, node)
-            placeholderCache.set(template, { index })
-            // console.log("creating placeholder template...")
-            return template.nextSibling
+          /* update parts for this node */
+          if (i) {
+            const partsBefore = parts.slice(0, i)
+            cache.set(node, partsBefore)
+            newParts = partsBefore
           }
+
+          /* create the placeholder */
+          const template = asTemplate(``)
+          node.after(template)
+          placeholderCache.set(template, { index: part.value })
+
+          if (i < parts.length - 1) {
+            const partsAfter = parts.slice(+i + 1)
+            const textNode = document.createTextNode(`*`)
+
+            cache.set(textNode, partsAfter)
+            template.after(textNode)
+          }
+
+          parts = newParts
+
+          break
         }
 
-        if (parts) {
-          if (
-            parts.some(
-              ({ value: i }) => Array.isArray(v[i]) && v[i].some(isBlueprint)
-            )
-          ) {
-            console.log("A", node, parts)
-            return blockTemplate(node, v, parts[0].value)
+        const nextVal = parts.reduce((a, { type, value }) => {
+          if (type === 1) return a + value
+
+          const x = v[value]
+
+          if (isNaN(x) && (!x || x.length === 0)) {
+            return a
           }
 
-          const nextVal = parts.reduce((a, { type, value }) => {
-            return a + (type === 1 ? value : v[value])
-          }, "")
+          return a + x
+        }, "")
 
-          if (node.textContent !== nextVal) {
-            node.textContent = nextVal
-          }
+        if (node.textContent !== nextVal) {
+          node.textContent = nextVal
         }
+
         break
       }
       case node.ELEMENT_NODE: {
@@ -226,8 +209,6 @@ export const update = (blueprint, rootNode) => {
           if (pEntry) {
             if (!v[pEntry.index]) return node.nextSibling
 
-            // console.log("upgrading placeholder...", v[pEntry.index])
-            console.log("B")
             const template = blockTemplate(node, v, pEntry.index)
 
             placeholderCache.delete(node)

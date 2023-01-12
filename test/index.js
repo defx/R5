@@ -60,7 +60,7 @@ describe("define()", () => {
     assert.equal($(`p`).textContent, "frankie says hello!")
   })
 
-  it.only("repeated blocks", async () => {
+  it("repeated blocks", async () => {
     const name = createName()
     define(name, () => {
       return {
@@ -74,7 +74,6 @@ describe("define()", () => {
         },
         render: ({ items, someClass }) =>
           html`<ul class="${someClass}">
-            foo
             ${items?.map(({ id, name }) => html`<li @key="${id}">${name}</li>`)}
           </ul>`,
       }
@@ -173,16 +172,18 @@ describe("define()", () => {
         },
         render: ({ items }) =>
           html`<ul>
+            foo
             ${items?.map(
               ({ id, name, age }) =>
                 html`<li @key="${id}">${name} (${age})</li>`
             )}
+            bar
           </ul>`,
       }
     })
     mount(`<${name}></${name}>`)
 
-    assert.equal($(name).innerHTML, `<ul><template></template></ul>`)
+    assert.equal($(name).innerHTML, `<ul>foobar</ul>`)
 
     $(name).$dispatch({
       type: "set",
