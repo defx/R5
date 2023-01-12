@@ -8,7 +8,7 @@ describe("define()", () => {
         state: {
           message: "hello!",
         },
-        render: ({ message }) => html`<p>${message}</p>`,
+        render: ({ message }) => html` <p>${message}</p> `,
       }
     })
     mount(`<${name}></${name}>`)
@@ -60,7 +60,7 @@ describe("define()", () => {
     assert.equal($(`p`).textContent, "frankie says hello!")
   })
 
-  it("repeated blocks", async () => {
+  it.only("repeated blocks", async () => {
     const name = createName()
     define(name, () => {
       return {
@@ -74,6 +74,7 @@ describe("define()", () => {
         },
         render: ({ items, someClass }) =>
           html`<ul class="${someClass}">
+            foo
             ${items?.map(({ id, name }) => html`<li @key="${id}">${name}</li>`)}
           </ul>`,
       }
