@@ -256,4 +256,36 @@ describe("define()", () => {
 
     assert.equal($("h1").textContent, `hello! 👋`)
   })
+
+  it("primitive arrays", () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          items: [1, 2, 3, 4, 5],
+        },
+        update: {
+          set: (_, { payload }) => {
+            return payload
+          },
+        },
+        render: ({ items }) =>
+          html`<ul>
+            ${items?.map((n) => html`<li>${n}</li>`)}
+          </ul>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    assert.equal($(name).textContent, "12345")
+
+    $(name).$dispatch({
+      type: "set",
+      payload: {
+        items: [1, 3, 5, 2, 4],
+      },
+    })
+
+    assert.equal($(name).textContent, "13524")
+  })
 })

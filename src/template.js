@@ -144,6 +144,13 @@ function blockTemplate(node, v, i) {
   return template
 }
 
+const compareKeyedLists = (key, a = [], b = []) => {
+  let delta = b.map(([k, item]) =>
+    !key ? (k in a ? k : -1) : a.findIndex(([_, v]) => v[key] === item[key])
+  )
+  if (a.length !== b.length || !delta.every((a, b) => a === b)) return delta
+}
+
 export const update = (blueprint, rootNode) => {
   const { t, v } = blueprint
 
@@ -220,27 +227,13 @@ export const update = (blueprint, rootNode) => {
 
           if (Array.isArray(value)) {
             const { index, key, values: prevVals = [], blockSize } = cacheEntry
-
             const nextVals = v[index].map(({ v }) => v)
-
-            if (key === undefined) {
-              console.warn("ignoring list without keys", node.innerHTML)
-              break
-            }
-
-            const prevKeys = prevVals.map((v) => v[key])
-            const nextKeys = nextVals.map((v) => v[key])
-
-            if (nextKeys.some((v) => v === undefined)) {
-              console.warn(
-                `You are trying to re-render a list but one or more of your list keys are undefined!`
-              )
-              return false
-            }
-
-            const delta = nextKeys.map((b) =>
-              prevKeys.findIndex((a) => a === b)
+            const delta = compareKeyedLists(
+              key,
+              Object.entries(prevVals),
+              Object.entries(nextVals)
             )
+
             listSync(node, delta, blockSize)
             const listItems = elementSiblings(node, delta.length, blockSize)
 
