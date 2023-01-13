@@ -1,5 +1,9 @@
 import { define, html } from "../src/index.js"
 
+function reformat(str) {
+  return str.replace(/\n|\s{2,}/g, "")
+}
+
 describe("define()", () => {
   it("replaces text", async () => {
     const name = createName()
@@ -127,7 +131,7 @@ describe("define()", () => {
     mount(`<${name}></${name}>`)
 
     assert.ok(
-      $(name).innerHTML.includes(
+      reformat($(name).innerHTML).includes(
         `<dt>Beast of Bodmin</dt><dd>A large feline inhabiting Bodmin Moor.</dd><dt>Morgawr</dt><dd>A sea serpent.</dd><dt>Owlman</dt><dd>A giant owl-like creature.</dd></dl>`
       )
     )
@@ -154,7 +158,7 @@ describe("define()", () => {
     })
 
     assert.ok(
-      $(name).innerHTML.includes(
+      reformat($(name).innerHTML).includes(
         `<dt>The Harpenden Hakutaku</dt><dd>A talking beast which handed down knowledge on harmful spirits</dd><dt>Beast of Bodmin</dt><dd>A large feline inhabiting Bodmin Moor.</dd><dt>Owlman</dt><dd>A giant owl-like creature.</dd><dt>Morgawr</dt><dd>A sea serpent.</dd></dl>`
       )
     )
@@ -183,7 +187,7 @@ describe("define()", () => {
     })
     mount(`<${name}></${name}>`)
 
-    assert.equal($(name).innerHTML, `<ul>foobar</ul>`)
+    assert.equal(reformat($(name).innerHTML), `<ul>foobar</ul>`)
 
     $(name).$dispatch({
       type: "set",
@@ -287,5 +291,46 @@ describe("define()", () => {
     })
 
     assert.equal($(name).textContent, "13524")
+  })
+
+  it("SVG support", () => {
+    const name = createName()
+    define(name, () => {
+      return {
+        state: {
+          items: [
+            { x: 10, y: 10, fill: "#ccc", width: 10, height: 10 },
+            { x: 30, y: 30, fill: "#ccc", width: 10, height: 10 },
+            { x: 50, y: 50, fill: "#ccc", width: 10, height: 10 },
+          ],
+        },
+        update: {
+          set: (_, { payload }) => {
+            return payload
+          },
+        },
+        render: ({ items }) =>
+          html`<svg
+            version="1.1"
+            width="100"
+            height="100"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            ${items?.map(
+              ({ x, y, fill, width, height }) => html` <rect
+                class="foo"
+                x="${x}"
+                y="${y}"
+                fill="${fill}"
+                width="${width}"
+                height="${height}"
+              ></rect>`
+            )}
+          </svg>`,
+      }
+    })
+    mount(`<${name}></${name}>`)
+
+    // assert.equal($(name).textContent, "12345")
   })
 })

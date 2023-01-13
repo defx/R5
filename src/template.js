@@ -1,10 +1,6 @@
 import { last, walk } from "./helpers.js"
 import { hasMustache, getParts } from "./token.js"
 
-function reformat(str) {
-  return str.replace(/\n|\s{2,}/g, "")
-}
-
 const blueprints = new WeakSet()
 
 // @todo: cache strings
@@ -17,7 +13,7 @@ export const html = (strings, ...values) => {
     .trim()
 
   const x = {
-    t: reformat(tpl),
+    t: tpl,
     v: values,
   }
   blueprints.add(x)
