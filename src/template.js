@@ -1,34 +1,34 @@
 import { walk } from "./helpers.js"
-import { hasMustache, getParts } from "./token.js"
-
-const blueprints = new WeakSet()
-
-function isBlueprint(v) {
-  return blueprints.has(v)
-}
+import { hasMustache, getParts, stripPlaceholders } from "./token.js"
 
 export const ATTRIBUTE = 0
 export const TEXT = 1
 
+function last(v) {
+  return v[v.length - 1]
+}
+
+function withPlaceholders(strings) {
+  return (
+    strings.slice(0, -1).reduce((a, s, i) => {
+      return a + s + `{{ ${i} }}`
+    }, "") + last(strings)
+  ).trim()
+}
+
+const cache = new Map()
+
 export function html(strings, ...values) {
-  const l = values.length
-  const xtpl = strings
-    .reduce((a, s, i) => {
-      return a + s + (i < l ? `{{ ${i} }}` : ``)
-    }, "")
-    .trim()
+  const key = strings.join("").trim()
 
-  const map = parse(xtpl)
-  const tpl = strings.join("").trim()
-
-  const x = {
-    t: tpl,
-    v: values,
-    map,
+  if (!cache.has(key)) {
+    cache.set(key, parse(withPlaceholders(strings)))
   }
-  blueprints.add(x)
 
-  return x
+  return {
+    ...cache.get(key),
+    v: values,
+  }
 }
 
 function parse(str) {
@@ -36,20 +36,21 @@ function parse(str) {
   div.innerHTML = str
   const map = {}
 
-  let i = 0
+  let k = 0
 
   walk(div.firstChild, (node) => {
-    i++
+    k++
 
     switch (node.nodeType) {
       case node.TEXT_NODE: {
         const { textContent } = node
-        if (!hasMustache(textContent) === false) return
+
+        if (!hasMustache(textContent)) return
 
         const parts = getParts(textContent)
 
-        map[i] = map[i] || []
-        map[i].push({
+        map[k] = map[k] || []
+        map[k].push({
           type: TEXT,
           parts,
         })
@@ -66,19 +67,24 @@ function parse(str) {
 
           const parts = getParts(value)
 
-          if (parts) {
-            map[i] = map[i] || []
-            map[i].push({
-              type: ATTRIBUTE,
-              name,
-              parts,
-            })
-          }
+          map[k] = map[k] || []
+          map[k].push({
+            type: ATTRIBUTE,
+            name,
+            parts,
+          })
+
+          /* remove attribute now that we have parts mapped otherwise we'll get "unexpected value..." warnings when attaching SVG defs.
+          we keep the text placeholders otherwise we risk losing the nodes once attached */
+          node.setAttribute(name, stripPlaceholders(value))
         }
         break
       }
     }
   })
 
-  return map
+  return {
+    t: div.innerHTML,
+    m: map,
+  }
 }

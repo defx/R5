@@ -1,28 +1,9 @@
 import { last, walk } from "./helpers.js"
 import { hasMustache, getParts } from "./token.js"
-
-const blueprints = new WeakSet()
-
-// @todo: cache strings
-export const html = (strings, ...values) => {
-  const l = values.length
-  const tpl = strings
-    .reduce((a, s, i) => {
-      return a + s + (i < l ? `{{ ${i} }}` : ``)
-    }, "")
-    .trim()
-
-  const x = {
-    t: tpl,
-    v: values,
-  }
-  blueprints.add(x)
-
-  return x
-}
+import { TEXT, ATTRIBUTE } from "./template.js"
 
 function isBlueprint(v) {
-  return blueprints.has(v)
+  // @todo
 }
 
 function asTemplate(str) {
@@ -148,6 +129,51 @@ const compareKeyedLists = (key, a = [], b = []) => {
 }
 
 export const update = (blueprint, rootNode) => {
+  console.log(blueprint)
+  const { m, v } = blueprint
+  let i = 0
+  walk(rootNode, (node) => {
+    i++
+
+    const entries = m[i]
+    if (!entries) return
+
+    for (const entry of entries) {
+      switch (entry.type) {
+        case TEXT: {
+          const nextVal = entry.parts.reduce((a, { type, value }) => {
+            if (type === 1) return a + value
+
+            const x = v[value]
+
+            if (isNaN(x) && (!x || x.length === 0)) {
+              return a
+            }
+
+            return a + x
+          }, "")
+
+          if (node.textContent !== nextVal) {
+            node.textContent = nextVal
+          }
+          break
+        }
+        case ATTRIBUTE: {
+          const nextVal = entry.parts.reduce((a, { type, value }) => {
+            return a + (type === 1 ? value : v[value])
+          }, "")
+
+          if (node.getAttribute(entry.name) !== nextVal) {
+            node.setAttribute(entry.name, nextVal)
+          }
+          break
+        }
+      }
+    }
+  })
+}
+
+export const xupdate = (blueprint, rootNode) => {
   const { t, v } = blueprint
 
   walk(rootNode, (node) => {

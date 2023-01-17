@@ -1,7 +1,7 @@
 import { configure } from "./store.js"
 import { update, fromTemplate } from "./dom.js"
 
-export { html } from "./dom.js"
+export { html } from "./template.js"
 
 export const define = (name, factory) => {
   if (customElements?.get(name)) return
@@ -27,12 +27,12 @@ export const define = (name, factory) => {
 
         this.prepend(frag)
 
-        onChange((state) => {
-          const blueprint = config.render(state)
-          update(blueprint, rootNode)
-        })
+        // onChange((state) => {
+        //   const blueprint = config.render(state)
+        //   update(blueprint, rootNode)
+        // })
 
-        this.$dispatch = dispatch
+        // this.$dispatch = dispatch
       }
     }
   )

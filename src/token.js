@@ -3,6 +3,8 @@ const KEY = 2
 
 export const hasMustache = (v) => v.match(/({{[^{}]+}})/)
 
+export const stripPlaceholders = (v) => v.replace(/({{[^{}]+}})/g, "")
+
 export const getParts = (value) =>
   value
     .trim()
