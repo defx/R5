@@ -1,21 +1,7 @@
+import { walk } from "./helpers.js"
+import { hasMustache, getParts } from "./token.js"
+
 const blueprints = new WeakSet()
-
-export const html = (strings, ...values) => {
-  const l = values.length
-  const tpl = strings
-    .reduce((a, s, i) => {
-      return a + s + (i < l ? `{{ ${i} }}` : ``)
-    }, "")
-    .trim()
-
-  const x = {
-    t: tpl,
-    v: values,
-  }
-  blueprints.add(x)
-
-  return x
-}
 
 function isBlueprint(v) {
   return blueprints.has(v)
@@ -24,54 +10,73 @@ function isBlueprint(v) {
 export const ATTRIBUTE = 0
 export const TEXT = 1
 
-/*
+export function html(strings, ...values) {
+  const l = values.length
+  const xtpl = strings
+    .reduce((a, s, i) => {
+      return a + s + (i < l ? `{{ ${i} }}` : ``)
+    }, "")
+    .trim()
 
-takes an array of strings (from a template literal) and returns a map from traversal index to binding descriptor:
+  const map = parse(xtpl)
+  const tpl = strings.join("").trim()
 
-{
-    index: (nodeTraversalIndex)
-    type: ATTRIBUTE || TEXT,
-    name?: (attribute name)
+  const x = {
+    t: tpl,
+    v: values,
+    map,
+  }
+  blueprints.add(x)
+
+  return x
 }
 
-*/
-export function parse(strings) {
-  let c = 0
-  let tagOpen = false
-  let map = {}
+function parse(str) {
+  const div = document.createElement("div")
+  div.innerHTML = str
+  const map = {}
 
-  strings.forEach((str, i) => {
-    //...
-    str.split("").forEach((char, j) => {
-      //...
-      if (char === "<") {
-        tagOpen = true
-        if (str[j + 1] !== "/") c++
+  let i = 0
+
+  walk(div.firstChild, (node) => {
+    i++
+
+    switch (node.nodeType) {
+      case node.TEXT_NODE: {
+        const { textContent } = node
+        if (!hasMustache(textContent) === false) return
+
+        const parts = getParts(textContent)
+
+        map[i] = map[i] || []
+        map[i].push({
+          type: TEXT,
+          parts,
+        })
+
+        break
       }
+      case node.ELEMENT_NODE: {
+        let attrs = [...node.attributes]
+        let i = attrs.length
+        while (i--) {
+          let { name, value } = attrs[i]
 
-      if (char === ">") {
-        tagOpen = false
+          if (!hasMustache(value)) continue
+
+          const parts = getParts(value)
+
+          if (parts) {
+            map[i] = map[i] || []
+            map[i].push({
+              type: ATTRIBUTE,
+              name,
+              parts,
+            })
+          }
+        }
+        break
       }
-    })
-
-    if (i < strings.length - 1) {
-      // this is followed by a value...
-
-      const type = tagOpen ? ATTRIBUTE : TEXT
-
-      const entry = { type }
-
-      if (type === ATTRIBUTE) {
-        // ....
-        const start = str.lastIndexOf(" ") + 1
-        const end = str.lastIndexOf("=")
-        const name = str.slice(start, end)
-        entry.name = name
-      }
-
-      map[c] = map[c] || []
-
-      map[c].push(entry)
     }
   })
 
