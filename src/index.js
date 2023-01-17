@@ -1,7 +1,7 @@
 import { configure } from "./store.js"
-import { update, fromTemplate } from "./template.js"
+import { update, fromTemplate } from "./dom.js"
 
-export { html } from "./template.js"
+export { html } from "./dom.js"
 
 export const define = (name, factory) => {
   if (customElements?.get(name)) return
