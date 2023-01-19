@@ -23,7 +23,7 @@ export const define = (name, factory) => {
         const frag = fromTemplate(blueprint.t)
         const rootNode = frag.firstChild
 
-        update(blueprint, rootNode)
+        update(blueprint, frag)
 
         this.prepend(frag)
 

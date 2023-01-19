@@ -31,15 +31,22 @@ export function html(strings, ...values) {
   }
 }
 
+function childIndex(node) {
+  return Array.from(node.parentNode.childNodes).indexOf(node)
+}
+
 function parse(str) {
   const div = document.createElement("div")
   div.innerHTML = str
+  const lookup = new WeakMap()
   const map = {}
 
-  let k = 0
+  let k = -1
 
-  walk(div.firstChild, (node) => {
+  walk(div, (node) => {
     k++
+
+    lookup.set(node, k)
 
     switch (node.nodeType) {
       case node.TEXT_NODE: {
@@ -49,10 +56,13 @@ function parse(str) {
 
         const parts = getParts(textContent)
 
-        map[k] = map[k] || []
-        map[k].push({
+        let j = lookup.get(node.parentNode)
+
+        map[j] = map[j] || []
+        map[j].push({
           type: TEXT,
           parts,
+          childIndex: childIndex(node),
         })
 
         break

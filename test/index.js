@@ -1,7 +1,7 @@
 import { define, html } from "../src/index.js"
 
 function reformat(str) {
-  return str.replace(/\n|\s{2,}/g, "")
+  return str.replace(/\n|\s{2,}/gm, "")
 }
 
 describe("define()", () => {
@@ -10,14 +10,21 @@ describe("define()", () => {
     define(name, () => {
       return {
         state: {
-          message: "hello!",
+          one: "un",
+          two: "deux",
+          three: "trois",
         },
-        render: ({ message }) => html` <p>${message}</p> `,
+        render: ({ one, two, three }) =>
+          html`
+            ${one}
+            <p>${two}</p>
+            ${three}
+          `,
       }
     })
     mount(`<${name}></${name}>`)
 
-    assert.equal($(`p`)?.textContent, "hello!")
+    assert.equal(reformat($(name).innerHTML), "un<p>deux</p>trois")
   })
   it("replaces single attributes", async () => {
     const name = createName()

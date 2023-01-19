@@ -129,13 +129,14 @@ const compareKeyedLists = (key, a = [], b = []) => {
 }
 
 export const update = (blueprint, rootNode) => {
-  console.log(blueprint)
+  // console.log(JSON.stringify(blueprint.m, null, 2))
   const { m, v } = blueprint
-  let i = 0
+  let i = -1
   walk(rootNode, (node) => {
     i++
 
     const entries = m[i]
+
     if (!entries) return
 
     for (const entry of entries) {
@@ -153,8 +154,10 @@ export const update = (blueprint, rootNode) => {
             return a + x
           }, "")
 
-          if (node.textContent !== nextVal) {
-            node.textContent = nextVal
+          let targetNode = [...node.childNodes][entry.childIndex]
+
+          if (targetNode.textContent !== nextVal) {
+            targetNode.textContent = nextVal
           }
           break
         }
