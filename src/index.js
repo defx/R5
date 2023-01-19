@@ -27,12 +27,12 @@ export const define = (name, factory) => {
 
         this.prepend(frag)
 
-        // onChange((state) => {
-        //   const blueprint = config.render(state)
-        //   update(blueprint, rootNode)
-        // })
+        onChange((state) => {
+          const blueprint = config.render(state)
+          update(blueprint, this)
+        })
 
-        // this.$dispatch = dispatch
+        this.$dispatch = dispatch
       }
     }
   )

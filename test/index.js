@@ -10,9 +10,14 @@ describe("define()", () => {
     define(name, () => {
       return {
         state: {
-          one: "un",
+          // one: "un",
           two: "deux",
-          three: "trois",
+          // three: "trois",
+        },
+        update: {
+          set: (_, { payload }) => {
+            return payload
+          },
         },
         render: ({ one, two, three }) =>
           html`
@@ -23,6 +28,17 @@ describe("define()", () => {
       }
     })
     mount(`<${name}></${name}>`)
+
+    assert.equal(reformat($(name).innerHTML), "<p>deux</p>")
+
+    $(name).$dispatch({
+      type: "set",
+      payload: {
+        one: "un",
+        two: "deux",
+        three: "trois",
+      },
+    })
 
     assert.equal(reformat($(name).innerHTML), "un<p>deux</p>trois")
   })
