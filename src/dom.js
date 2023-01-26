@@ -3,7 +3,7 @@ import { hasMustache, getParts, STATIC, DYNAMIC } from "./token.js"
 import { TEXT, ATTRIBUTE } from "./template.js"
 
 function isBlueprint(v) {
-  // @todo
+  return Object.keys(v).sort().join(".") === "m.t.v"
 }
 
 function asTemplate(str) {
@@ -129,11 +129,18 @@ const compareKeyedLists = (key, a = [], b = []) => {
 }
 
 export const update = (blueprint, rootNode) => {
-  console.log(JSON.stringify(blueprint.m, null, 2))
+  // console.log(JSON.stringify(blueprint.m, null, 2))
+
   const { m, v } = blueprint
   let i = -1
   walk(rootNode, (node) => {
     i++
+
+    if (node === rootNode || node.nodeType === node.ELEMENT_NODE) {
+      console.log("UPDATE:ELEMEMENT", node)
+    }
+
+    return
 
     const entries = m[i]
 

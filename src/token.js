@@ -1,5 +1,5 @@
-export const STATIC = "static"
-export const DYNAMIC = "dynamic"
+export const STATIC = "STATIC"
+export const DYNAMIC = "DYNAMIC"
 
 export const hasMustache = (v) => v.match(/({{[^{}]+}})/)
 

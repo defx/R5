@@ -1,9 +1,9 @@
 import { walk } from "./helpers.js"
 import { hasMustache, getParts, stripPlaceholders } from "./token.js"
 
-export const ATTRIBUTE = 0
-export const TEXT = 1
-export const KEY = 2
+export const ATTRIBUTE = "ATTRIBUTE"
+export const TEXT = "TEXT"
+export const KEY = "KEY"
 
 function last(v) {
   return v[v.length - 1]
@@ -27,7 +27,8 @@ export function html(strings, ...values) {
   }
 
   return {
-    ...cache.get(key),
+    m: cache.get(key),
+    t: key,
     v: values,
   }
 }
@@ -39,6 +40,7 @@ function childIndex(node) {
 function parse(str) {
   const div = document.createElement("div")
   div.innerHTML = str
+
   const lookup = new WeakMap()
   const map = {}
 
@@ -51,6 +53,8 @@ function parse(str) {
 
     switch (node.nodeType) {
       case node.TEXT_NODE: {
+        // console.log("TEXT", node)
+
         const { textContent } = node
 
         if (!hasMustache(textContent)) return
@@ -95,13 +99,13 @@ function parse(str) {
             node.setAttribute(name, stripPlaceholders(value))
           }
         }
+
+        console.log("TPL:ELEMENT", [...node.childNodes])
+
         break
       }
     }
   })
 
-  return {
-    t: div.innerHTML,
-    m: map,
-  }
+  return map
 }
