@@ -3,6 +3,7 @@ import { hasMustache, getParts, stripPlaceholders } from "./token.js"
 
 export const ATTRIBUTE = 0
 export const TEXT = 1
+export const KEY = 2
 
 function last(v) {
   return v[v.length - 1]
@@ -76,17 +77,23 @@ function parse(str) {
           if (!hasMustache(value)) continue
 
           const parts = getParts(value)
+          const isKey = name === "@key"
+          const type = isKey ? KEY : ATTRIBUTE
 
           map[k] = map[k] || []
           map[k].push({
-            type: ATTRIBUTE,
+            type,
             name,
             parts,
           })
 
           /* remove attribute now that we have parts mapped otherwise we'll get "unexpected value..." warnings when attaching SVG defs.
           we keep the text placeholders otherwise we risk losing the nodes once attached */
-          node.setAttribute(name, stripPlaceholders(value))
+          if (isKey) {
+            node.removeAttribute(name)
+          } else {
+            node.setAttribute(name, stripPlaceholders(value))
+          }
         }
         break
       }

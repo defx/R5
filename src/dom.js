@@ -1,5 +1,5 @@
 import { last, walk } from "./helpers.js"
-import { hasMustache, getParts } from "./token.js"
+import { hasMustache, getParts, STATIC, DYNAMIC } from "./token.js"
 import { TEXT, ATTRIBUTE } from "./template.js"
 
 function isBlueprint(v) {
@@ -129,7 +129,7 @@ const compareKeyedLists = (key, a = [], b = []) => {
 }
 
 export const update = (blueprint, rootNode) => {
-  // console.log(JSON.stringify(blueprint.m, null, 2))
+  console.log(JSON.stringify(blueprint.m, null, 2))
   const { m, v } = blueprint
   let i = -1
   walk(rootNode, (node) => {
@@ -142,10 +142,10 @@ export const update = (blueprint, rootNode) => {
     for (const entry of entries) {
       switch (entry.type) {
         case TEXT: {
-          const nextVal = entry.parts.reduce((a, { type, value }) => {
-            if (type === 1) return a + value
+          const nextVal = entry.parts.reduce((a, { type, value, index }) => {
+            if (type === STATIC) return a + value
 
-            const x = v[value]
+            const x = v[index]
 
             if (isNaN(x) && (!x || x.length === 0)) {
               return a
@@ -162,8 +162,8 @@ export const update = (blueprint, rootNode) => {
           break
         }
         case ATTRIBUTE: {
-          const nextVal = entry.parts.reduce((a, { type, value }) => {
-            return a + (type === 1 ? value : v[value])
+          const nextVal = entry.parts.reduce((a, { type, value, index }) => {
+            return a + (type === STATIC ? value : v[index])
           }, "")
 
           if (node.getAttribute(entry.name) !== nextVal) {

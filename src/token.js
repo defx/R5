@@ -1,5 +1,5 @@
-const VALUE = 1
-const KEY = 2
+export const STATIC = "static"
+export const DYNAMIC = "dynamic"
 
 export const hasMustache = (v) => v.match(/({{[^{}]+}})/)
 
@@ -15,12 +15,12 @@ export const getParts = (value) =>
 
       if (!match)
         return {
-          type: VALUE,
+          type: STATIC,
           value,
         }
 
       return {
-        type: KEY,
-        value: +match[1].trim(),
+        type: DYNAMIC,
+        index: +match[1].trim(),
       }
     })
