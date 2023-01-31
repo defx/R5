@@ -9,6 +9,11 @@ function last(v) {
   return v[v.length - 1]
 }
 
+/*
+
+we replace the values with placeholders and then parse the resulting DOM before discarding the unattached node as a simple alternative to implementing a dom string token parser. i haven't decided whether this is the optimal solution yet but its good enough for now.
+
+*/
 function withPlaceholders(strings) {
   return (
     strings.slice(0, -1).reduce((a, s, i) => {
@@ -27,8 +32,7 @@ export function html(strings, ...values) {
   }
 
   return {
-    m: cache.get(key),
-    t: key,
+    ...cache.get(key),
     v: values,
   }
 }
@@ -70,6 +74,12 @@ function parse(str) {
           childIndex: childIndex(node),
         })
 
+        /*
+        
+        at this point we need to inject our <template> nodes for each placeholder
+        
+        */
+
         break
       }
       case node.ELEMENT_NODE: {
@@ -107,5 +117,8 @@ function parse(str) {
     }
   })
 
-  return map
+  return {
+    m: map,
+    t: div.innerHTML,
+  }
 }

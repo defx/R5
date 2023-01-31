@@ -21,7 +21,6 @@ export const define = (name, factory) => {
 
         const blueprint = config.render(getState())
         const frag = fromTemplate(blueprint.t)
-        const rootNode = frag.firstChild
 
         update(blueprint, frag)
 
