@@ -50,7 +50,6 @@ function parse(str) {
       if (!hasMustache(textContent)) continue
 
       const parts = getParts(textContent)
-
       const frag = document.createDocumentFragment()
 
       for (const part of parts) {
@@ -111,54 +110,3 @@ function parse(str) {
     t: template.innerHTML,
   }
 }
-
-/*
-
-walk(div, (node) => {
-    k++
-
-    switch (node.nodeType) {
-      case node.TEXT_NODE: {
-        const { textContent } = node
-
-        if (!hasMustache(textContent)) return
-
-        const parts = getParts(textContent)
-
-        map[j] = map[j] || []
-        map[j].push({
-          type: TEXT,
-          parts,
-          childIndex: childIndex(node),
-        })
-
-        break
-      }
-      case node.ELEMENT_NODE: {
-        let attrs = [...node.attributes]
-        let i = attrs.length
-        while (i--) {
-          let { name, value } = attrs[i]
-
-          if (!hasMustache(value)) continue
-
-          const parts = getParts(value)
-          const isKey = name === "@key"
-          const type = isKey ? KEY : ATTRIBUTE
-
-          map[k] = map[k] || []
-          map[k].push({
-            type,
-            name,
-            parts,
-          })
-
-          node.removeAttribute(name)
-        }
-
-        break
-      }
-    }
-  })
-
-*/
