@@ -14,22 +14,38 @@ describe("define()", () => {
           two: "deux",
           // three: "trois",
           four: "quatre",
+          // five: "cinq",
+          six: "six",
+          // seven: "sept",
+          eight: "huit",
         },
         update: {
           set: (_, { payload }) => {
             return payload
           },
         },
-        render: ({ one, two, three, four, five }) =>
-          // prettier-ignores
-          html`${one}
+        render: ({ one, two, three, four, five, six, seven, eight }) =>
+          html`A ${one}, and a&nbsp;
             <p>${two}</p>
-            ${three}
-            <p>${four}</p>
-            ${five}`,
+            , and a ${three}, and a ${four}, and a
+            <p>${five}</p>
+            , ${six}, ${seven}, ${eight}!`,
       }
     })
     mount(`<${name}></${name}>`)
+
+    assert.equal(
+      $(name).textContent,
+      `A , and adeux, and a , and a quatre, and a, six, , huit!`
+    )
+
+    console.log($(name).textContent)
+
+    /*
+    
+    @todo: figure out why it seems to ignore the &nbsp; ....is this the tree walker filters?
+    
+    */
 
     // assert.equal(reformat($(name).innerHTML), "<p>deux</p>")
 

@@ -37,3 +37,12 @@ export const debounce = (fn) => {
     }
   }
 }
+
+export function treeWalker(context) {
+  return document.createTreeWalker(
+    context,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT,
+    null,
+    false
+  )
+}

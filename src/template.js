@@ -1,5 +1,5 @@
-import { walk } from "./helpers.js"
-import { hasMustache, getParts, stripPlaceholders } from "./token.js"
+import { hasMustache, getParts, STATIC, DYNAMIC } from "./token.js"
+import { treeWalker } from "./helpers.js"
 
 export const ATTRIBUTE = "ATTRIBUTE"
 export const TEXT = "TEXT"
@@ -9,11 +9,6 @@ function last(v) {
   return v[v.length - 1]
 }
 
-/*
-
-we replace the values with placeholders and then parse the resulting DOM before discarding the unattached node as a simple alternative to implementing a dom string token parser. i haven't decided whether this is the optimal solution yet but its good enough for now.
-
-*/
 function withPlaceholders(strings) {
   return (
     strings.slice(0, -1).reduce((a, s, i) => {
@@ -25,7 +20,7 @@ function withPlaceholders(strings) {
 const cache = new Map()
 
 export function html(strings, ...values) {
-  const key = strings.join("").trim()
+  const key = strings.join("{{ x }}").trim()
 
   if (!cache.has(key)) {
     cache.set(key, parse(withPlaceholders(strings)))
@@ -37,35 +32,76 @@ export function html(strings, ...values) {
   }
 }
 
-function childIndex(node) {
-  return Array.from(node.parentNode.childNodes).indexOf(node)
-}
-
 function parse(str) {
-  const div = document.createElement("div")
-  div.innerHTML = str
-
-  const lookup = new WeakMap()
   const map = {}
 
   let k = -1
 
-  walk(div, (node) => {
-    k++
+  const template = document.createElement("template")
+  template.innerHTML = str
 
-    lookup.set(node, k)
+  const walker = treeWalker(template.content)
+
+  while (walker.nextNode()) {
+    let node = walker.currentNode
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      const { textContent } = node
+      if (!hasMustache(textContent)) return
+
+      const parts = getParts(textContent)
+
+      const frag = document.createDocumentFragment()
+
+      for (const part of parts) {
+        k += 1
+
+        if (part.type === STATIC) {
+          const text = document.createTextNode(part.value)
+          frag.appendChild(text)
+          walker.currentNode = text
+        }
+        if (part.type === DYNAMIC) {
+          const comment = document.createComment(`S-${part.index}`)
+          frag.appendChild(comment)
+          walker.currentNode = comment
+          map[k] = {
+            type: TEXT,
+            index: part.index,
+          }
+        }
+      }
+
+      node.parentNode.replaceChild(frag, node)
+
+      continue
+    }
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      //...
+    }
+
+    k += 1
+  }
+
+  return {
+    m: map,
+    t: template.innerHTML,
+  }
+}
+
+/*
+
+walk(div, (node) => {
+    k++
 
     switch (node.nodeType) {
       case node.TEXT_NODE: {
-        // console.log("TEXT", node)
-
         const { textContent } = node
 
         if (!hasMustache(textContent)) return
 
         const parts = getParts(textContent)
-
-        let j = lookup.get(node.parentNode)
 
         map[j] = map[j] || []
         map[j].push({
@@ -73,12 +109,6 @@ function parse(str) {
           parts,
           childIndex: childIndex(node),
         })
-
-        /*
-        
-        at this point we need to inject our <template> nodes for each placeholder
-        
-        */
 
         break
       }
@@ -101,24 +131,12 @@ function parse(str) {
             parts,
           })
 
-          /* remove attribute now that we have parts mapped otherwise we'll get "unexpected value..." warnings when attaching SVG defs.
-          we keep the text placeholders otherwise we risk losing the nodes once attached */
-          if (isKey) {
-            node.removeAttribute(name)
-          } else {
-            node.setAttribute(name, stripPlaceholders(value))
-          }
+          node.removeAttribute(name)
         }
-
-        console.log("TPL:ELEMENT", [...node.childNodes])
 
         break
       }
     }
   })
 
-  return {
-    m: map,
-    t: div.innerHTML,
-  }
-}
+*/

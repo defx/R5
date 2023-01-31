@@ -1,5 +1,5 @@
-import { last, walk } from "./helpers.js"
-import { hasMustache, getParts, STATIC, DYNAMIC } from "./token.js"
+import { last, walk, treeWalker } from "./helpers.js"
+import { hasMustache, getParts } from "./token.js"
 import { TEXT, ATTRIBUTE } from "./template.js"
 
 function isBlueprint(v) {
@@ -128,194 +128,41 @@ const compareKeyedLists = (key, a = [], b = []) => {
   if (a.length !== b.length || !delta.every((a, b) => a === b)) return delta
 }
 
+/*
+
+for this we can cache the node reference so that we only need to walk once
+
+*/
+
 export const update = (blueprint, rootNode) => {
-  // console.log(JSON.stringify(blueprint.m, null, 2))
-
+  const walker = treeWalker(rootNode)
   const { m, v } = blueprint
-  let i = -1
-  walk(rootNode, (node) => {
-    i++
 
-    if (node === rootNode || node.nodeType === node.ELEMENT_NODE) {
-      console.log("UPDATE:ELEMEMENT", node)
-    }
+  let k = -1
 
-    return
+  while (walker.nextNode()) {
+    k += 1
+    let node = walker.currentNode
+    if (k in m === false) continue
 
-    const entries = m[i]
+    const entry = m[k]
+    const value = v[entry.index]
+    const useableValue = !isNaN(value) || value
+    const isComment = node.nodeType === Node.COMMENT_NODE
 
-    if (!entries) return
-
-    for (const entry of entries) {
-      switch (entry.type) {
-        case TEXT: {
-          const nextVal = entry.parts.reduce((a, { type, value, index }) => {
-            if (type === STATIC) return a + value
-
-            const x = v[index]
-
-            if (isNaN(x) && (!x || x.length === 0)) {
-              return a
-            }
-
-            return a + x
-          }, "")
-
-          let targetNode = [...node.childNodes][entry.childIndex]
-
-          if (targetNode.textContent !== nextVal) {
-            targetNode.textContent = nextVal
-          }
-          break
-        }
-        case ATTRIBUTE: {
-          const nextVal = entry.parts.reduce((a, { type, value, index }) => {
-            return a + (type === STATIC ? value : v[index])
-          }, "")
-
-          if (node.getAttribute(entry.name) !== nextVal) {
-            node.setAttribute(entry.name, nextVal)
-          }
-          break
-        }
+    if (useableValue && isComment) {
+      // swap placeholder for node
+      if (entry.type === TEXT) {
+        const textNode = document.createTextNode(value)
+        node.replaceWith(textNode)
+        walker.currentNode = textNode
       }
     }
-  })
-}
 
-export const xupdate = (blueprint, rootNode) => {
-  const { t, v } = blueprint
-
-  walk(rootNode, (node) => {
-    switch (node.nodeType) {
-      case node.TEXT_NODE: {
-        let parts = findParts(node)
-
-        if (!parts) break
-
-        for (const [i, part] of Object.entries(parts)) {
-          if (!isBlueprint(v[part.value]?.[0] || v[part.value])) continue
-
-          let newParts
-
-          /* update parts for this node */
-          if (i) {
-            const partsBefore = parts.slice(0, i)
-            cache.set(node, partsBefore)
-            newParts = partsBefore
-          }
-
-          /* create the placeholder */
-          const template = asTemplate(``)
-          node.after(template)
-          placeholderCache.set(template, { index: part.value })
-
-          if (i < parts.length - 1) {
-            const partsAfter = parts.slice(+i + 1)
-            const textNode = document.createTextNode(`*`)
-
-            cache.set(textNode, partsAfter)
-            template.after(textNode)
-          }
-
-          parts = newParts
-
-          break
-        }
-
-        const nextVal = parts.reduce((a, { type, value }) => {
-          if (type === 1) return a + value
-
-          const x = v[value]
-
-          if (isNaN(x) && (!x || x.length === 0)) {
-            return a
-          }
-
-          return a + x
-        }, "")
-
-        if (node.textContent !== nextVal) {
-          node.textContent = nextVal
-        }
-
-        break
-      }
-      case node.ELEMENT_NODE: {
-        if (node.nodeName === "TEMPLATE") {
-          const pEntry = placeholderCache.get(node)
-
-          if (pEntry) {
-            if (!v[pEntry.index]) return node.nextSibling
-
-            const template = blockTemplate(node, v, pEntry.index)
-
-            placeholderCache.delete(node)
-            return template
-          }
-
-          const cacheEntry = rbCache.get(node)
-          const value = v[cacheEntry.index]
-
-          if (Array.isArray(value)) {
-            const { index, key, values: prevVals = [], blockSize } = cacheEntry
-            const nextVals = v[index].map(({ v }) => v)
-            const delta = compareKeyedLists(
-              key,
-              Object.entries(prevVals),
-              Object.entries(nextVals)
-            )
-
-            listSync(node, delta, blockSize)
-            const listItems = elementSiblings(node, delta.length, blockSize)
-
-            listItems.forEach((items, i) =>
-              items.forEach((item) => update(v[index][i], item))
-            )
-
-            rbCache.set(node, { ...cacheEntry, values: nextVals })
-
-            return last(last(listItems))?.nextSibling
-          } else {
-            // console.log("render conditional block...", node, value)
-
-            const shouldRender = !!value
-            const attached = node.getAttribute("attached") === "true"
-            const { blockSize } = cacheEntry
-
-            if (shouldRender !== attached) {
-              if (shouldRender) {
-                const n = fromTemplate(value.t)
-                update(value.v, n)
-                node.after(n)
-              } else {
-                elementSiblings(node, 1, blockSize)[0].forEach((el) =>
-                  el.remove()
-                )
-              }
-            }
-
-            node.setAttribute("attached", shouldRender)
-          }
-        }
-
-        let attrs = [...node.attributes]
-        let i = attrs.length
-        while (i--) {
-          let { name, value } = attrs[i]
-
-          const parts = getParts(value)
-          if (parts) {
-            const nextVal = parts.reduce((a, { type, value }) => {
-              return a + (type === 1 ? value : v[value])
-            }, "")
-            if (node.getAttribute(name) !== nextVal) {
-              node.setAttribute(name, nextVal)
-            }
-          }
-        }
-        break
-      }
+    if (!useableValue && !isComment) {
+      // swap node for placeholder
     }
-  })
+
+    console.log(entry, node, value, node.nodeType === Node.COMMENT_NODE)
+  }
 }

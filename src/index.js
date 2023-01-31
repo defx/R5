@@ -22,6 +22,8 @@ export const define = (name, factory) => {
         const blueprint = config.render(getState())
         const frag = fromTemplate(blueprint.t)
 
+        console.log(blueprint)
+
         update(blueprint, frag)
 
         this.prepend(frag)
