@@ -35,6 +35,6 @@ describe("template.html", () => {
       )}
     </svg>`
 
-    console.log(map)
+    // console.log(map)
   })
 })

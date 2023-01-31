@@ -39,37 +39,24 @@ describe("define()", () => {
       `A , and adeux, and a , and a quatre, and a, six, , huit!`
     )
 
-    console.log($(name).textContent)
+    $(name).$dispatch({
+      type: "set",
+      payload: {
+        one: "un",
+        two: "deux",
+        three: "trois",
+        four: "quatre",
+        five: "cinq",
+        six: "six",
+        seven: "sept",
+        eight: "huit",
+      },
+    })
 
-    /*
-    
-    @todo: figure out why it seems to ignore the &nbsp; ....is this the tree walker filters?
-    
-    */
-
-    // assert.equal(reformat($(name).innerHTML), "<p>deux</p>")
-
-    // $(name).$dispatch({
-    //   type: "set",
-    //   payload: {
-    //     one: "un",
-    //     two: "deux",
-    //     // three: "trois",
-    //   },
-    // })
-
-    // assert.equal(reformat($(name).innerHTML), "un<p>deux</p>")
-
-    // $(name).$dispatch({
-    //   type: "set",
-    //   payload: {
-    //     // one: "un",
-    //     two: "deux",
-    //     three: "trois",
-    //   },
-    // })
-
-    // assert.equal(reformat($(name).innerHTML), "<p>deux</p>trois")
+    assert.equal(
+      $(name).textContent,
+      `A un, and adeux, and a trois, and a quatre, and acinq, six, sept, huit!`
+    )
   })
   it("replaces single attributes", async () => {
     const name = createName()

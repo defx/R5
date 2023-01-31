@@ -20,9 +20,10 @@ export const define = (name, factory) => {
         )
 
         const blueprint = config.render(getState())
-        const frag = fromTemplate(blueprint.t)
 
-        console.log(blueprint)
+        // console.log(blueprint)
+
+        const frag = fromTemplate(blueprint.t)
 
         update(blueprint, frag)
 

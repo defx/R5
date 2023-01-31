@@ -1,6 +1,7 @@
 import { last, walk, treeWalker } from "./helpers.js"
 import { hasMustache, getParts } from "./token.js"
 import { TEXT, ATTRIBUTE } from "./template.js"
+import { STATIC, DYNAMIC } from "./token.js"
 
 function isBlueprint(v) {
   return Object.keys(v).sort().join(".") === "m.t.v"
@@ -134,6 +135,10 @@ for this we can cache the node reference so that we only need to walk once
 
 */
 
+function truthy(v) {
+  return v === 0 || v
+}
+
 export const update = (blueprint, rootNode) => {
   const walker = treeWalker(rootNode)
   const { m, v } = blueprint
@@ -145,22 +150,46 @@ export const update = (blueprint, rootNode) => {
     let node = walker.currentNode
     if (k in m === false) continue
 
-    const entry = m[k]
-    const value = v[entry.index]
-    const useableValue = !isNaN(value) || value
-    const isComment = node.nodeType === Node.COMMENT_NODE
+    for (const entry of m[k]) {
+      switch (node.nodeType) {
+        case Node.COMMENT_NODE: {
+          const value = v[entry.index]
+          if (truthy(value)) {
+            // swap placeholder for node
+            const textNode = document.createTextNode(value)
+            node.replaceWith(textNode)
+            walker.currentNode = textNode
+            break
+          }
+        }
+        case Node.TEXT_NODE: {
+          const value = v[entry.index]
+          if (!truthy(value)) {
+            // swap node for placeholder
+          }
+          break
+        }
+        case Node.ELEMENT_NODE: {
+          if (entry.type === ATTRIBUTE) {
+            const { name, parts } = entry
 
-    if (useableValue && isComment) {
-      // swap placeholder for node
-      if (entry.type === TEXT) {
-        const textNode = document.createTextNode(value)
-        node.replaceWith(textNode)
-        walker.currentNode = textNode
+            const value = parts.reduce((a, part) => {
+              if (part.type === DYNAMIC) {
+                return a + v[part.index]
+              }
+              if (part.type === STATIC) {
+                return a + part.value
+              }
+              return a
+            }, "")
+
+            if (node.getAttribute(name) !== value) {
+              node.setAttribute(name, value)
+            }
+          }
+          break
+        }
       }
-    }
-
-    if (!useableValue && !isComment) {
-      // swap node for placeholder
     }
   }
 }

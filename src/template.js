@@ -47,7 +47,7 @@ function parse(str) {
 
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
-      if (!hasMustache(textContent)) return // @todo update the flow control to ensure that the index (k) is incremented correctly
+      if (!hasMustache(textContent)) continue
 
       const parts = getParts(textContent)
 
@@ -65,10 +65,12 @@ function parse(str) {
           const comment = document.createComment(`S-${part.index}`)
           frag.appendChild(comment)
           walker.currentNode = comment
-          map[k] = {
+
+          map[k] = map[k] || []
+          map[k].push({
             type: TEXT,
             index: part.index,
-          }
+          })
         }
       }
 
@@ -78,10 +80,30 @@ function parse(str) {
     }
 
     if (node.nodeType === Node.ELEMENT_NODE) {
-      //...
-    }
+      k += 1
 
-    k += 1
+      let attrs = [...node.attributes]
+      let i = attrs.length
+
+      while (i--) {
+        let { name, value } = attrs[i]
+
+        if (!hasMustache(value)) continue
+
+        const parts = getParts(value)
+        const isKey = name === "@key"
+        const type = isKey ? KEY : ATTRIBUTE
+
+        map[k] = map[k] || []
+        map[k].push({
+          type,
+          name,
+          parts,
+        })
+
+        node.removeAttribute(name)
+      }
+    }
   }
 
   return {
