@@ -47,7 +47,7 @@ function parse(str) {
 
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
-      if (!hasMustache(textContent)) return
+      if (!hasMustache(textContent)) return // @todo update the flow control to ensure that the index (k) is incremented correctly
 
       const parts = getParts(textContent)
 
