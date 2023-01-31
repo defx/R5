@@ -155,7 +155,7 @@ export const update = (blueprint, rootNode) => {
       switch (node.nodeType) {
         case Node.COMMENT_NODE: {
           const value = v[entry.index]
-          if (truthy(value)) {
+          if (truthy(value) && entry.type === TEXT) {
             // swap placeholder for node
             const textNode = document.createTextNode(value)
             node.replaceWith(textNode)
