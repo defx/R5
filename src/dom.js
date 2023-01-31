@@ -162,7 +162,5 @@ export const update = (blueprint, rootNode) => {
     if (!useableValue && !isComment) {
       // swap node for placeholder
     }
-
-    console.log(entry, node, value, node.nodeType === Node.COMMENT_NODE)
   }
 }
