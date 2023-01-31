@@ -139,6 +139,7 @@ function truthy(v) {
   return v === 0 || v
 }
 
+// @todo: cache the node refs so that we only walk the whole tree on the first update
 export const update = (blueprint, rootNode) => {
   const walker = treeWalker(rootNode)
   const { m, v } = blueprint
