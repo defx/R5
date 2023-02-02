@@ -91,12 +91,12 @@ function parse(str) {
         if (!hasMustache(value)) continue
 
         const parts = getParts(value)
-        const isKey = name === "@key"
-        const type = isKey ? KEY : ATTRIBUTE
+        // const isKey = name === "@key"
+        // const type = isKey ? KEY : ATTRIBUTE
 
         map[k] = map[k] || []
         map[k].push({
-          type,
+          type: ATTRIBUTE,
           name,
           parts,
         })

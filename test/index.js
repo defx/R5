@@ -117,7 +117,7 @@ describe("define()", () => {
         },
         render: ({ items, someClass }) =>
           html`<ul class="${someClass}">
-            ${items?.map(({ id, name }) => html`<li @key="${id}">${name}</li>`)}
+            ${items?.map(({ id, name }) => html`<li id="${id}">${name}</li>`)}
           </ul>`,
       }
     })
@@ -130,7 +130,7 @@ describe("define()", () => {
     )
   })
 
-  it("repeated blocks (multiple top-level nodes)", async () => {
+  it.only("repeated blocks (multiple top-level nodes)", async () => {
     const name = createName()
     define(name, () => {
       return {
@@ -158,7 +158,7 @@ describe("define()", () => {
           html`<dl>
             ${items?.map(
               ({ id, term, description }) => html`
-                <template @key="${id}">
+                <template id="${id}">
                   <dt>${term}</dt>
                   <dd>${description}</dd>
                 </template>

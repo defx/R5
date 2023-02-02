@@ -3,7 +3,12 @@ import { hasMustache, getParts } from "./token.js"
 import { TEXT, ATTRIBUTE } from "./template.js"
 import { STATIC, DYNAMIC } from "./token.js"
 import * as Placeholder from "./placeholder.js"
-import { EMPTY } from "./placeholder.js"
+import {
+  EMPTY,
+  REPEATED_BLOCK,
+  BLOCK_OPEN,
+  BLOCK_CLOSE,
+} from "./placeholder.js"
 
 function isTemplateResult(v) {
   return Object.keys(v).sort().join(".") === "m.t.v"
@@ -128,7 +133,7 @@ const compareKeyedLists = (key, a = [], b = []) => {
   let delta = b.map(([k, item]) =>
     !key ? (k in a ? k : -1) : a.findIndex(([_, v]) => v[key] === item[key])
   )
-  if (a.length !== b.length || !delta.every((a, b) => a === b)) return delta
+  if (a.length !== b.length || !delta.every((n, i) => n === i)) return delta
 }
 
 /*
@@ -141,14 +146,47 @@ function truthy(v) {
   return v === 0 || v
 }
 
-const REPEATED_BLOCK = "REPEATED_BLOCK"
-
 function typeOfValue(v) {
   if (Array.isArray(v) && isTemplateResult(v[0])) {
     return REPEATED_BLOCK
   }
 
   return TEXT
+}
+
+function getBlocks(placeholder) {
+  const { id, length = 0 } = Placeholder.getMeta(placeholder)
+  if (!id || length === 0) return []
+  const blocks = []
+  let i = 0
+  let open = false
+  walk(
+    placeholder.nextSibling,
+    (node) => {
+      // ...
+      if (node.nodeType === Node.COMMENT_NODE) {
+        const type = Placeholder.type(node)
+
+        if (type === BLOCK_OPEN && Placeholder.getMeta(node).id === id) {
+          open = true
+          i++
+        }
+        if (type === BLOCK_CLOSE && Placeholder.getMeta(node).id === id) {
+          open = false
+          if (blocks.length === length) {
+            // stop looking
+            return false
+          }
+        }
+      } else if (open) {
+        blocks[i] = blocks[i] || []
+        blocks[i].push(node)
+      }
+    },
+    false
+  )
+
+  return blocks
 }
 
 // @todo: cache the node refs so that we only walk the whole tree on the first update
@@ -198,15 +236,19 @@ export const update = (templateResult, rootNode) => {
                 break
               }
               if (valueType === REPEATED_BLOCK) {
-                const placeholder = Placeholder.create(REPEATED_BLOCK)
+                const id = Date.now()
+                const placeholder = Placeholder.create(REPEATED_BLOCK, { id })
                 node.replaceWith(placeholder)
                 walker.currentNode = placeholder
                 node = placeholder
                 placeholderType = REPEATED_BLOCK
               }
             }
+
             case REPEATED_BLOCK: {
               //...sync list
+              const meta = Placeholder.getMeta(node)
+              const blocks = getBlocks(node)
             }
             default: {
               // NO PLACEHOLDER
