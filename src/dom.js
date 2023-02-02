@@ -197,6 +197,13 @@ export const update = (templateResult, rootNode) => {
                 walker.currentNode = textNode
                 break
               }
+              if (valueType === REPEATED_BLOCK) {
+                const placeholder = Placeholder.create(REPEATED_BLOCK)
+                node.replaceWith(placeholder)
+                walker.currentNode = placeholder
+                node = placeholder
+                placeholderType = REPEATED_BLOCK
+              }
             }
             case REPEATED_BLOCK: {
               //...sync list
@@ -213,7 +220,7 @@ export const update = (templateResult, rootNode) => {
           }
         } else {
           if (placeholderType !== EMPTY) {
-            const placeholder = Placeholder.create("EMPTY")
+            const placeholder = Placeholder.create(EMPTY)
             node.replaceWith(placeholder)
             walker.currentNode = placeholder
             break
