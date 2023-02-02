@@ -1,13 +1,8 @@
 import { configure } from "./store.js"
 import { update } from "./dom.js"
+import { templateNodeFromString } from "./helpers.js"
 
 export { html } from "./template.js"
-
-function templateNodeFromString(str) {
-  let node = document.createElement("template")
-  node.innerHTML = str.trim()
-  return node
-}
 
 export const define = (name, factory) => {
   if (customElements?.get(name)) return
@@ -25,10 +20,10 @@ export const define = (name, factory) => {
           this
         )
 
-        const blueprint = config.render(getState())
-        const frag = templateNodeFromString(blueprint.t).content.cloneNode(true)
+        const result = config.render(getState())
+        const frag = templateNodeFromString(result.t).content.cloneNode(true)
 
-        update(blueprint, frag)
+        update(result, frag)
 
         this.prepend(frag)
 

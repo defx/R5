@@ -46,3 +46,9 @@ export function treeWalker(context) {
     false
   )
 }
+
+export function templateNodeFromString(str) {
+  let node = document.createElement("template")
+  node.innerHTML = str.trim()
+  return node
+}

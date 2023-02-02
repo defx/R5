@@ -1,5 +1,6 @@
 import { hasMustache, getParts, STATIC, DYNAMIC } from "./token.js"
 import { treeWalker } from "./helpers.js"
+import * as Placeholder from "./placeholder.js"
 
 export const ATTRIBUTE = "ATTRIBUTE"
 export const TEXT = "TEXT"
@@ -20,7 +21,7 @@ function withPlaceholders(strings) {
 const cache = new Map()
 
 export function html(strings, ...values) {
-  const key = strings.join("{{ x }}").trim()
+  const key = strings.join("{{ ? }}").trim()
 
   if (!cache.has(key)) {
     cache.set(key, parse(withPlaceholders(strings)))
@@ -61,13 +62,13 @@ function parse(str) {
           walker.currentNode = text
         }
         if (part.type === DYNAMIC) {
-          const comment = document.createComment(`S-${part.index}`)
-          frag.appendChild(comment)
-          walker.currentNode = comment
+          const placeholder = Placeholder.create("EMPTY")
+          frag.appendChild(placeholder)
+          walker.currentNode = placeholder
 
           map[k] = map[k] || []
           map[k].push({
-            type: TEXT,
+            // type: TEXT,
             index: part.index,
           })
         }
