@@ -103,7 +103,7 @@ describe("define()", () => {
     assert.equal($(`p`).textContent, "frankie says hello!")
   })
 
-  it.only("repeated blocks", async () => {
+  it("repeated blocks", async () => {
     const name = createName()
     define(name, () => {
       return {

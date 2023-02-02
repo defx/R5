@@ -3,6 +3,7 @@ import { hasMustache, getParts } from "./token.js"
 import { TEXT, ATTRIBUTE } from "./template.js"
 import { STATIC, DYNAMIC } from "./token.js"
 import * as Placeholder from "./placeholder.js"
+import { EMPTY } from "./placeholder.js"
 
 function isTemplateResult(v) {
   return Object.keys(v).sort().join(".") === "m.t.v"
@@ -142,7 +143,7 @@ function truthy(v) {
 
 const REPEATED_BLOCK = "REPEATED_BLOCK"
 
-function valueType(v) {
+function typeOfValue(v) {
   if (Array.isArray(v) && isTemplateResult(v[0])) {
     return REPEATED_BLOCK
   }
@@ -162,84 +163,61 @@ export const update = (templateResult, rootNode) => {
     let node = walker.currentNode
     if (k in m === false) continue
 
-    // console.log(node, m[k], v)
-
-    /*
-    
-    for any nodeType other than comment, if the value is falsy then we need to swap for a placeholder...
-    
-    */
-
     for (const entry of m[k]) {
-      switch (node.nodeType) {
-        case Node.COMMENT_NODE: {
-          let placeholderType = Placeholder.type(node)
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const { name, parts } = entry
 
-          if (!placeholderType) continue
-
-          const value = v[entry.index]
-
-          if (!truthy(value)) continue
-
-          const type = valueType(value)
-
-          console.log({ placeholderType })
-
-          if (placeholderType === "EMPTY" && type === TEXT) {
-            // swap placeholder for node
-            const textNode = document.createTextNode(value)
-            node.replaceWith(textNode)
-            walker.currentNode = textNode
-            break
+        const value = parts.reduce((a, part) => {
+          if (part.type === DYNAMIC) {
+            return a + v[part.index]
           }
-
-          if (placeholderType === "EMPTY" && type === REPEATED_BLOCK) {
-            /*
-            
-            the previous implementation created a template node, but that approach incorrectly assumes that the same list template will always be used. the template needs to be processed node by node.
-
-            what if...instead of removing the placeholder, you update its content to identify it as a list placeholder?
-
-            but wait, is it correct to assume that this will be a list next time? no, the type should always be driven off the value. that's fine though, when we swap to a list then we update the placeholder to identify this. this allows us to correctly tear down the list if/when we need to swap to another type/placeholder.
-
-            */
-            const rbPlaceholder = Placeholder.create("REPEATED_BLOCK")
-
-            node.replaceWith(rbPlaceholder)
-            node = rbPlaceholder
-            placeholderType = "REPEATED_BLOCK"
+          if (part.type === STATIC) {
+            return a + part.value
           }
+          return a
+        }, "")
 
-          if (placeholderType === "REPEATED_BLOCK") {
-            console.log("REPEATED_BLOCK", node, value)
-          }
+        if (node.getAttribute(name) !== value) {
+          node.setAttribute(name, value)
         }
-        case Node.TEXT_NODE: {
-          const value = v[entry.index]
-          if (!truthy(value)) {
-            // swap node for placeholder
-          }
-          break
-        }
-        case Node.ELEMENT_NODE: {
-          if (entry.type === ATTRIBUTE) {
-            const { name, parts } = entry
+      } else {
+        // TEXT,  COMMENT
+        const value = v[entry.index]
+        const valueType = typeOfValue(value)
+        const { nodeType } = node
+        let placeholderType = Placeholder.type(node)
 
-            const value = parts.reduce((a, part) => {
-              if (part.type === DYNAMIC) {
-                return a + v[part.index]
+        if (truthy(value)) {
+          switch (placeholderType) {
+            case EMPTY: {
+              // upgrade...
+              if (valueType === TEXT) {
+                const textNode = document.createTextNode(value)
+                node.replaceWith(textNode)
+                walker.currentNode = textNode
+                break
               }
-              if (part.type === STATIC) {
-                return a + part.value
+            }
+            case REPEATED_BLOCK: {
+              //...sync list
+            }
+            default: {
+              // NO PLACEHOLDER
+              if (valueType === TEXT) {
+                if (value !== node.textContent) {
+                  node.textContent = value
+                  break
+                }
               }
-              return a
-            }, "")
-
-            if (node.getAttribute(name) !== value) {
-              node.setAttribute(name, value)
             }
           }
-          break
+        } else {
+          if (placeholderType !== EMPTY) {
+            const placeholder = Placeholder.create("EMPTY")
+            node.replaceWith(placeholder)
+            walker.currentNode = placeholder
+            break
+          }
         }
       }
     }
