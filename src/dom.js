@@ -227,17 +227,15 @@ export const update = (templateResult, rootNode) => {
                   Blocks.create(groupId, id, value[i].t)
               )
 
-              const lastBlock = last(nextBlocks)
-              const lastNode = lastBlock.lastChild || last(lastBlock)
+              const lastNode = last(last(nextBlocks).nodes)
 
               let t = node
 
-              console.log({ nextBlocks })
-
               nextBlocks.forEach((block, i) => {
-                const { firstChild, lastChild } = block
+                const firstChild = block.nodes[0]
+                const lastChild = last(block.nodes)
                 if (t.nextSibling !== firstChild) {
-                  Blocks.after(t, block)
+                  t.after(...block.nodes)
                   update(value[i], firstChild.nextSibling)
                 }
                 t = lastChild

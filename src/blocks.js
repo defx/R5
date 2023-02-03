@@ -13,27 +13,23 @@ function strip(str) {
 export function create(groupId, id, stringTemplate) {
   const meta = JSON.stringify({ id, groupId })
 
-  return templateNodeFromString(
-    `<!--{{ BLOCK_OPEN:meta(${meta}) }}-->${stringTemplate}<!--{{ BLOCK_CLOSE:meta(${meta}) }}-->`
+  const { childNodes: nodes } = templateNodeFromString(
+    `<!-- {{ BLOCK_OPEN:meta(${meta}) }} -->${stringTemplate}<!-- {{ BLOCK_CLOSE:meta(${meta}) }} -->`
   ).content.cloneNode(true)
+
+  return {
+    id,
+    nodes,
+  }
 }
 
 export function remove(block) {
   block.nodes.forEach((node) => node.remove())
 }
 
-export function after(target, block) {
-  if (block.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-    target.after(block)
-  } else {
-    const frag = document.createDocumentFragment()
-    block.nodes.forEach((node) => frag.append(node))
-    target.after(frag)
-  }
-}
-
 export function get(placeholder) {
   const { id, length = 0 } = Placeholder.getMeta(placeholder)
+
   if (!id || length === 0) return []
   const blocks = []
   let open = false

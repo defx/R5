@@ -4,7 +4,7 @@ export const BLOCK_OPEN = "BLOCK_OPEN"
 export const BLOCK_CLOSE = "BLOCK_CLOSE"
 
 export function type({ textContent = "" }) {
-  return textContent.match(/^{{ ([^\s:]+)/)?.[1]
+  return textContent.match(/^\s*{{\s*([^\s:]+)/m)?.[1]
 }
 
 export function create(type, meta = {}) {

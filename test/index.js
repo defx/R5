@@ -134,7 +134,7 @@ describe("define()", () => {
     )
   })
 
-  it.only("repeated blocks (multiple top-level nodes)", async () => {
+  it("repeated blocks (multiple top-level nodes)", async () => {
     const name = createName()
     define(name, () => {
       return {
