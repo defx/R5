@@ -3,6 +3,7 @@ import { hasMustache, getParts } from "./token.js"
 import { TEXT, ATTRIBUTE } from "./template.js"
 import { STATIC, DYNAMIC } from "./token.js"
 import * as Placeholder from "./placeholder.js"
+import * as Blocks from "./blocks.js"
 import {
   EMPTY,
   REPEATED_BLOCK,
@@ -154,51 +155,22 @@ function typeOfValue(v) {
   return TEXT
 }
 
-function getBlocks(placeholder) {
-  const { id, length = 0 } = Placeholder.getMeta(placeholder)
-  if (!id || length === 0) return []
-  const blocks = []
-  let i = 0
-  let open = false
-  walk(
-    placeholder.nextSibling,
-    (node) => {
-      // ...
-      if (node.nodeType === Node.COMMENT_NODE) {
-        const type = Placeholder.type(node)
-
-        if (type === BLOCK_OPEN && Placeholder.getMeta(node).id === id) {
-          open = true
-          i++
-        }
-        if (type === BLOCK_CLOSE && Placeholder.getMeta(node).id === id) {
-          open = false
-          if (blocks.length === length) {
-            // stop looking
-            return false
-          }
-        }
-      } else if (open) {
-        blocks[i] = blocks[i] || []
-        blocks[i].push(node)
-      }
-    },
-    false
-  )
-
-  return blocks
-}
-
 // @todo: cache the node refs so that we only walk the whole tree on the first update
 export const update = (templateResult, rootNode) => {
   const walker = treeWalker(rootNode)
   const { m, v } = templateResult
 
+  console.log(m, rootNode)
+
   let k = -1
 
   while (walker.nextNode()) {
+    // this causes it to skip the first node.
     k += 1
     let node = walker.currentNode
+
+    console.log(k, node)
+
     if (k in m === false) continue
 
     for (const entry of m[k]) {
@@ -248,8 +220,46 @@ export const update = (templateResult, rootNode) => {
             case REPEATED_BLOCK: {
               //...sync list
               const meta = Placeholder.getMeta(node)
-              const blocks = getBlocks(node)
+              const blocks = Blocks.get(node)
+              const groupId = meta.id
+              const prevIds = blocks.map(({ id }) => id)
+              const nextIds = value.map(({ m, v }) => v[m[0].id])
+              const removals = prevIds
+                .filter((id) => nextIds.includes(id) === false)
+                .map((id) => blocks.find((block) => block.id === id))
+
+              removals.forEach(Blocks.remove)
+
+              const nextBlocks = nextIds.map(
+                (id, i) =>
+                  blocks.find((block) => block.id === id) ||
+                  Blocks.create(groupId, id, value[i].t)
+              )
+
+              const lastBlock = last(nextBlocks)
+              const lastNode = lastBlock.lastChild || last(lastBlock)
+
+              let t = node
+
+              nextBlocks.forEach((block, i) => {
+                const { firstChild, lastChild } = block
+                if (t.nextSibling !== firstChild) {
+                  Blocks.after(t, block)
+                  // @todo: recur to update
+                  console.log("update")
+                  update(value[i], firstChild.nextSibling)
+                }
+                t = lastChild
+              })
+
+              console.log("pickup", lastNode.nextSibling)
+
+              walker.currentChild = lastNode
             }
+            // case BLOCK_OPEN: {
+            //   console.log(BLOCK_OPEN, node)
+            //   break
+            // }
             default: {
               // NO PLACEHOLDER
               if (valueType === TEXT) {

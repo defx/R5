@@ -101,6 +101,8 @@ function parse(str) {
           parts,
         })
 
+        if (name === "id") map[k].id = parts[0].index
+
         node.removeAttribute(name)
       }
     }
