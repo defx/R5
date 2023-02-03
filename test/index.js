@@ -218,9 +218,8 @@ describe("define()", () => {
         render: ({ items }) =>
           html`<ul>
             foo
-            ${items?.map(
-              ({ id, name, age }) =>
-                html`<li @key="${id}">${name} (${age})</li>`
+            ${items?.map(({ id, name, age }) =>
+              html`<li>${name} (${age})</li>`.key(id)
             )}
             bar
           </ul>`,
