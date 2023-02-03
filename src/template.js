@@ -48,11 +48,14 @@ function parse(str) {
 
   // console.log("PARSE", str)
 
-  walk(template.content, (node) => {
+  walk(template.content.firstChild, (node) => {
+    k += 1
+
+    // console.log("PARSE.node", node, k)
+
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
       if (!hasMustache(textContent)) {
-        // k += 1
         return
       }
 
@@ -61,8 +64,10 @@ function parse(str) {
       const parts = getParts(textContent)
       const frag = document.createDocumentFragment()
 
-      for (const part of parts) {
-        k += 1
+      let k2 = k
+
+      for (const [i, part] of Object.entries(parts)) {
+        k = k2 + +i
 
         if (part.type === STATIC) {
           const text = document.createTextNode(part.value)
@@ -79,15 +84,19 @@ function parse(str) {
         }
       }
 
-      const { firstChild } = frag
+      // const { nextSibling } = node
+
+      const nextSibling = node.nextSibling || node.parentNode.nextSibling
 
       node.parentNode.replaceChild(frag, node)
 
-      return firstChild
+      // console.log(nextSibling)
+
+      return nextSibling
     }
 
     if (node.nodeType === Node.ELEMENT_NODE) {
-      k += 1
+      // k += 1
 
       let attrs = [...node.attributes]
       let i = attrs.length

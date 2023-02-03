@@ -43,6 +43,8 @@ export const update = (templateResult, rootNode) => {
   walk(rootNode, (node) => {
     k += 1
 
+    // console.log("NODE", node, k, m[k])
+
     if (k in m === false) return
 
     for (const entry of m[k]) {
@@ -67,6 +69,8 @@ export const update = (templateResult, rootNode) => {
         const value = v[entry.index]
         const valueType = typeOfValue(value)
         let placeholderType = Placeholder.type(node)
+
+        // console.log({ value })
 
         if (truthy(value)) {
           switch (placeholderType) {
