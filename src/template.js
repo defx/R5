@@ -1,5 +1,5 @@
 import { hasMustache, getParts, STATIC, DYNAMIC } from "./token.js"
-import { treeWalker } from "./helpers.js"
+import { walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
 
 export const ATTRIBUTE = "ATTRIBUTE"
@@ -41,14 +41,10 @@ function parse(str) {
   const template = document.createElement("template")
   template.innerHTML = str
 
-  const walker = treeWalker(template.content)
-
-  while (walker.nextNode()) {
-    let node = walker.currentNode
-
+  walk(template.content, (node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
-      if (!hasMustache(textContent)) continue
+      if (!hasMustache(textContent)) return
 
       const parts = getParts(textContent)
       const frag = document.createDocumentFragment()
@@ -59,12 +55,12 @@ function parse(str) {
         if (part.type === STATIC) {
           const text = document.createTextNode(part.value)
           frag.appendChild(text)
-          walker.currentNode = text
+          // walker.currentNode = text
         }
         if (part.type === DYNAMIC) {
           const placeholder = Placeholder.create("EMPTY")
           frag.appendChild(placeholder)
-          walker.currentNode = placeholder
+          // walker.currentNode = placeholder
 
           map[k] = map[k] || []
           map[k].push({
@@ -74,9 +70,11 @@ function parse(str) {
         }
       }
 
+      const { firstChild } = frag
+
       node.parentNode.replaceChild(frag, node)
 
-      continue
+      return firstChild
     }
 
     if (node.nodeType === Node.ELEMENT_NODE) {
@@ -106,7 +104,7 @@ function parse(str) {
         node.removeAttribute(name)
       }
     }
-  }
+  })
 
   return {
     m: map,

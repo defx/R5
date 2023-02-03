@@ -23,11 +23,11 @@ export const define = (name, factory) => {
         const result = config.render(getState())
         const frag = templateNodeFromString(result.t).content.cloneNode(true)
 
-        update(result, frag)
+        update(result, frag.firstChild)
 
         this.prepend(frag)
 
-        onChange((state) => update(config.render(state), this))
+        onChange((state) => update(config.render(state), this.firstChild))
 
         this.$dispatch = dispatch
       }

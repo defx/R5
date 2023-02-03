@@ -157,19 +157,16 @@ function typeOfValue(v) {
 
 // @todo: cache the node refs so that we only walk the whole tree on the first update
 export const update = (templateResult, rootNode) => {
-  const walker = treeWalker(rootNode)
   const { m, v } = templateResult
 
   console.log(m, rootNode)
 
   let k = -1
 
-  while (walker.nextNode()) {
-    // this causes it to skip the first node.
+  walk(rootNode, (node) => {
     k += 1
-    let node = walker.currentNode
 
-    if (k in m === false) continue
+    if (k in m === false) return
 
     for (const entry of m[k]) {
       if (node.nodeType === Node.ELEMENT_NODE) {
@@ -202,14 +199,13 @@ export const update = (templateResult, rootNode) => {
               if (valueType === TEXT) {
                 const textNode = document.createTextNode(value)
                 node.replaceWith(textNode)
-                walker.currentNode = textNode
+                return textNode.nextSibling
                 break
               }
               if (valueType === REPEATED_BLOCK) {
                 const id = Date.now()
                 const placeholder = Placeholder.create(REPEATED_BLOCK, { id })
                 node.replaceWith(placeholder)
-                walker.currentNode = placeholder
                 node = placeholder
                 placeholderType = REPEATED_BLOCK
               }
@@ -243,16 +239,12 @@ export const update = (templateResult, rootNode) => {
                 const { firstChild, lastChild } = block
                 if (t.nextSibling !== firstChild) {
                   Blocks.after(t, block)
-                  // @todo: recur to update
-                  console.log("update")
                   update(value[i], firstChild.nextSibling)
                 }
                 t = lastChild
               })
 
-              console.log("pickup", lastNode.nextSibling)
-
-              walker.currentChild = lastNode
+              return lastNode.nextSibling
             }
             // case BLOCK_OPEN: {
             //   console.log(BLOCK_OPEN, node)
@@ -272,11 +264,12 @@ export const update = (templateResult, rootNode) => {
           if (placeholderType !== EMPTY) {
             const placeholder = Placeholder.create(EMPTY)
             node.replaceWith(placeholder)
-            walker.currentNode = placeholder
-            break
+            return placeholder.nextSibling
+            // walker.currentNode = placeholder
+            // break
           }
         }
       }
     }
-  }
+  })
 }
