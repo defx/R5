@@ -232,6 +232,8 @@ export const update = (templateResult, rootNode) => {
 
               let t = node
 
+              console.log({ nextBlocks })
+
               nextBlocks.forEach((block, i) => {
                 const { firstChild, lastChild } = block
                 if (t.nextSibling !== firstChild) {
@@ -239,6 +241,11 @@ export const update = (templateResult, rootNode) => {
                   update(value[i], firstChild.nextSibling)
                 }
                 t = lastChild
+              })
+
+              Placeholder.setMeta(node, {
+                ...meta,
+                length: nextBlocks.length,
               })
 
               return lastNode.nextSibling
