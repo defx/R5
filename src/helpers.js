@@ -1,9 +1,3 @@
-export const wrapToken = (v) => {
-  v = v.trim()
-  if (v.startsWith("{{")) return v
-  return `{{${v}}}`
-}
-
 export const last = (v = []) => v[v.length - 1]
 
 export const isWhitespace = (node) => {
@@ -36,15 +30,6 @@ export const debounce = (fn) => {
       })
     }
   }
-}
-
-export function treeWalker(context) {
-  return document.createTreeWalker(
-    context,
-    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT,
-    null,
-    false
-  )
 }
 
 export function templateNodeFromString(str) {

@@ -46,10 +46,17 @@ function parse(str) {
   const template = document.createElement("template")
   template.innerHTML = str.replace(/\n\s*/gm, "")
 
+  // console.log("PARSE", str)
+
   walk(template.content, (node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
-      if (!hasMustache(textContent)) return
+      if (!hasMustache(textContent)) {
+        // k += 1
+        return
+      }
+
+      // console.log("TEXT", node, k)
 
       const parts = getParts(textContent)
       const frag = document.createDocumentFragment()
@@ -88,7 +95,7 @@ function parse(str) {
       while (i--) {
         let { name, value } = attrs[i]
 
-        if (!hasMustache(value)) continue
+        if (!hasMustache(value)) return
 
         const parts = getParts(value)
 
@@ -103,6 +110,8 @@ function parse(str) {
       }
     }
   })
+
+  // console.log("MAP", map)
 
   return {
     m: map,
