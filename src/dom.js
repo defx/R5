@@ -129,11 +129,16 @@ export const update = (templateResult, rootNode) => {
 
               removals.forEach(Blocks.remove)
 
-              const nextBlocks = nextIds.map(
-                (id, i) =>
-                  blocks.find((block) => block.id === id) ||
-                  Blocks.create(groupId, id, value[i].t)
-              )
+              const nextBlocks = nextIds.map((id, i) => {
+                if (id !== null) {
+                  return (
+                    blocks.find((block) => block.id === id) ||
+                    Blocks.create(groupId, id, value[i].t)
+                  )
+                } else {
+                  return blocks[i] || Blocks.create(groupId, id, value[i].t)
+                }
+              })
 
               const lastNode = last(last(nextBlocks).nodes)
 
@@ -144,8 +149,8 @@ export const update = (templateResult, rootNode) => {
                 const lastChild = last(block.nodes)
                 if (t.nextSibling !== firstChild) {
                   t.after(...block.nodes)
-                  update(value[i], firstChild.nextSibling)
                 }
+                update(value[i], firstChild.nextSibling)
                 t = lastChild
               })
 
