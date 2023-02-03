@@ -296,9 +296,9 @@ describe("define()", () => {
     mount(`<${name}></${name}>`)
 
     // ensure that placeholder isn't upgraded when there's still no value
-    // $(name).$dispatch({ type: "set", payload: { showBlock: false } })
+    $(name).$dispatch({ type: "set", payload: { showBlock: false } })
 
-    // $(name).$dispatch({ type: "set", payload: { showBlock: true } })
+    $(name).$dispatch({ type: "set", payload: { showBlock: true } })
 
     // assert.equal($("h1").textContent, `hello! 👋`)
   })

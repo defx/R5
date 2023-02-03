@@ -3,10 +3,11 @@ import { TEXT } from "./template.js"
 import { STATIC, DYNAMIC } from "./token.js"
 import * as Placeholder from "./placeholder.js"
 import * as Blocks from "./blocks.js"
-import { EMPTY, REPEATED_BLOCK } from "./placeholder.js"
+import { EMPTY, REPEATED_BLOCK, CONDITIONAL_BLOCK } from "./placeholder.js"
+import * as ConditionalBlocks from "./conditional.js"
 
 function isTemplateResult(v) {
-  return Object.keys(v).sort().join(".") === "$key.key.m.t.v"
+  return v && Object.keys(v).sort().join(".") === "$key.key.m.t.v"
 }
 
 function asTemplate(str) {
@@ -29,6 +30,10 @@ function truthy(v) {
 function typeOfValue(v) {
   if (Array.isArray(v) && isTemplateResult(v[0])) {
     return REPEATED_BLOCK
+  }
+
+  if (isTemplateResult(v)) {
+    return CONDITIONAL_BLOCK
   }
 
   return TEXT
@@ -70,7 +75,7 @@ export const update = (templateResult, rootNode) => {
         const valueType = typeOfValue(value)
         let placeholderType = Placeholder.type(node)
 
-        // console.log({ value })
+        // console.log({ value, valueType })
 
         if (truthy(value)) {
           switch (placeholderType) {
@@ -86,9 +91,27 @@ export const update = (templateResult, rootNode) => {
                 const id = Date.now()
                 const placeholder = Placeholder.create(REPEATED_BLOCK, { id })
                 node.replaceWith(placeholder)
-                node = placeholder
-                placeholderType = REPEATED_BLOCK
+                k -= 1
+                return placeholder
               }
+              if (valueType === CONDITIONAL_BLOCK) {
+                const id = Date.now()
+                const placeholder = Placeholder.create(CONDITIONAL_BLOCK, {
+                  id,
+                  rendered: false,
+                })
+                node.replaceWith(placeholder)
+                k -= 1
+                return placeholder
+              }
+            }
+
+            case CONDITIONAL_BLOCK: {
+              const { rendered } = Placeholder.getMeta(node)
+              if (rendered) return
+              const block = ConditionalBlocks.create(value.t)
+              node.after(...block.nodes)
+              return
             }
 
             case REPEATED_BLOCK: {
