@@ -47,8 +47,6 @@ function parse(str) {
   template.innerHTML = str.replace(/\n\s*/gm, "")
 
   walk(template.content, (node) => {
-    // console.log("NODE", node)
-
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
       if (!hasMustache(textContent)) return
