@@ -33,6 +33,17 @@ export function html(strings, ...values) {
   }
 }
 
+function innerHTML(node) {
+  const target =
+    node.content.firstChild?.nodeName === "TEMPLATE"
+      ? node.content.firstChild
+      : node
+
+  console.log(node.innerHTML, target.innerHTML)
+
+  return target.innerHTML.trim()
+}
+
 function parse(str) {
   const map = {}
 
@@ -49,22 +60,21 @@ function parse(str) {
       const parts = getParts(textContent)
       const frag = document.createDocumentFragment()
 
+      console.log("TEXT", node, parts)
+
       for (const part of parts) {
         k += 1
 
         if (part.type === STATIC) {
           const text = document.createTextNode(part.value)
           frag.appendChild(text)
-          // walker.currentNode = text
         }
         if (part.type === DYNAMIC) {
           const placeholder = Placeholder.create("EMPTY")
           frag.appendChild(placeholder)
-          // walker.currentNode = placeholder
 
           map[k] = map[k] || []
           map[k].push({
-            // type: TEXT,
             index: part.index,
           })
         }
@@ -109,5 +119,6 @@ function parse(str) {
   return {
     m: map,
     t: template.innerHTML,
+    // t: innerHTML(template),
   }
 }

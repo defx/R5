@@ -186,10 +186,9 @@ export const update = (templateResult, rootNode) => {
           node.setAttribute(name, value)
         }
       } else {
-        // TEXT,  COMMENT
+        // TEXT, COMMENT
         const value = v[entry.index]
         const valueType = typeOfValue(value)
-        const { nodeType } = node
         let placeholderType = Placeholder.type(node)
 
         if (truthy(value)) {
@@ -246,10 +245,6 @@ export const update = (templateResult, rootNode) => {
 
               return lastNode.nextSibling
             }
-            // case BLOCK_OPEN: {
-            //   console.log(BLOCK_OPEN, node)
-            //   break
-            // }
             default: {
               // NO PLACEHOLDER
               if (valueType === TEXT) {
@@ -265,8 +260,6 @@ export const update = (templateResult, rootNode) => {
             const placeholder = Placeholder.create(EMPTY)
             node.replaceWith(placeholder)
             return placeholder.nextSibling
-            // walker.currentNode = placeholder
-            // break
           }
         }
       }

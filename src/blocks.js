@@ -1,9 +1,17 @@
 import { last, templateNodeFromString, walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
 
+function strip(str) {
+  return str
+    .replace(/^<template>/, "")
+    .replace(/<\/template>$/, "")
+    .trim()
+}
+
 // @todo: strip whitespace from templateString
 export function create(groupId, id, stringTemplate) {
   const meta = JSON.stringify({ id, groupId })
+
   return templateNodeFromString(
     `<!--{{ BLOCK_OPEN:meta(${meta}) }}-->${stringTemplate}<!--{{ BLOCK_CLOSE:meta(${meta}) }}-->`
   ).content.cloneNode(true)
