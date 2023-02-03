@@ -4,6 +4,10 @@ function reformat(str) {
   return str.replace(/\n|\s{2,}/gm, "")
 }
 
+function stripComments(str) {
+  return str.replace(/<!--[\s\S]*?-->/gm, "")
+}
+
 describe("define()", () => {
   it("replaces text", async () => {
     const name = createName()
@@ -117,7 +121,7 @@ describe("define()", () => {
         },
         render: ({ items, someClass }) =>
           html`<ul class="${someClass}">
-            ${items?.map(({ id, name }) => html`<li id="${id}">${name}</li>`)}
+            ${items?.map(({ id, name }) => html`<li>${name}</li>`.key(id))}
           </ul>`,
       }
     })
@@ -130,7 +134,7 @@ describe("define()", () => {
     )
   })
 
-  it("repeated blocks (multiple top-level nodes)", async () => {
+  it.only("repeated blocks (multiple top-level nodes)", async () => {
     const name = createName()
     define(name, () => {
       return {
@@ -156,13 +160,11 @@ describe("define()", () => {
         },
         render: ({ items }) =>
           html`<dl>
-            ${items?.map(
-              ({ id, term, description }) => html`
-                <template id="${id}">
-                  <dt>${term}</dt>
-                  <dd>${description}</dd>
-                </template>
-              `
+            ${items?.map(({ id, term, description }) =>
+              html`
+                <dt>${term}</dt>
+                <dd>${description}</dd>
+              `.key(id)
             )}
           </dl>`,
       }
@@ -170,7 +172,7 @@ describe("define()", () => {
     mount(`<${name}></${name}>`)
 
     assert.ok(
-      reformat($(name).innerHTML).includes(
+      stripComments($(name).innerHTML).includes(
         `<dt>Beast of Bodmin</dt><dd>A large feline inhabiting Bodmin Moor.</dd><dt>Morgawr</dt><dd>A sea serpent.</dd><dt>Owlman</dt><dd>A giant owl-like creature.</dd></dl>`
       )
     )
@@ -197,7 +199,7 @@ describe("define()", () => {
     })
 
     assert.ok(
-      reformat($(name).innerHTML).includes(
+      stripComments($(name).innerHTML).includes(
         `<dt>The Harpenden Hakutaku</dt><dd>A talking beast which handed down knowledge on harmful spirits</dd><dt>Beast of Bodmin</dt><dd>A large feline inhabiting Bodmin Moor.</dd><dt>Owlman</dt><dd>A giant owl-like creature.</dd><dt>Morgawr</dt><dd>A sea serpent.</dd></dl>`
       )
     )

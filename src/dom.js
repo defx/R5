@@ -12,7 +12,7 @@ import {
 } from "./placeholder.js"
 
 function isTemplateResult(v) {
-  return Object.keys(v).sort().join(".") === "m.t.v"
+  return Object.keys(v).sort().join(".") === "$key.key.m.t.v"
 }
 
 function asTemplate(str) {
@@ -159,8 +159,6 @@ function typeOfValue(v) {
 export const update = (templateResult, rootNode) => {
   const { m, v } = templateResult
 
-  console.log(m, rootNode)
-
   let k = -1
 
   walk(rootNode, (node) => {
@@ -216,7 +214,7 @@ export const update = (templateResult, rootNode) => {
               const blocks = Blocks.get(node)
               const groupId = meta.id
               const prevIds = blocks.map(({ id }) => id)
-              const nextIds = value.map(({ m, v }) => v[m[0].id])
+              const nextIds = value.map(({ $key }) => $key)
               const removals = prevIds
                 .filter((id) => nextIds.includes(id) === false)
                 .map((id) => blocks.find((block) => block.id === id))

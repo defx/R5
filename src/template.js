@@ -28,20 +28,14 @@ export function html(strings, ...values) {
   }
 
   return {
+    $key: null,
     ...cache.get(key),
     v: values,
+    key(k) {
+      this.$key = k
+      return this
+    },
   }
-}
-
-function innerHTML(node) {
-  const target =
-    node.content.firstChild?.nodeName === "TEMPLATE"
-      ? node.content.firstChild
-      : node
-
-  console.log(node.innerHTML, target.innerHTML)
-
-  return target.innerHTML.trim()
 }
 
 function parse(str) {
@@ -50,17 +44,17 @@ function parse(str) {
   let k = -1
 
   const template = document.createElement("template")
-  template.innerHTML = str
+  template.innerHTML = str.replace(/\n\s*/gm, "")
 
   walk(template.content, (node) => {
+    // console.log("NODE", node)
+
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
       if (!hasMustache(textContent)) return
 
       const parts = getParts(textContent)
       const frag = document.createDocumentFragment()
-
-      console.log("TEXT", node, parts)
 
       for (const part of parts) {
         k += 1
@@ -99,8 +93,6 @@ function parse(str) {
         if (!hasMustache(value)) continue
 
         const parts = getParts(value)
-        // const isKey = name === "@key"
-        // const type = isKey ? KEY : ATTRIBUTE
 
         map[k] = map[k] || []
         map[k].push({
@@ -108,8 +100,6 @@ function parse(str) {
           name,
           parts,
         })
-
-        if (name === "id") map[k].id = parts[0].index
 
         node.removeAttribute(name)
       }
@@ -119,6 +109,5 @@ function parse(str) {
   return {
     m: map,
     t: template.innerHTML,
-    // t: innerHTML(template),
   }
 }
