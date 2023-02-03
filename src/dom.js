@@ -169,8 +169,6 @@ export const update = (templateResult, rootNode) => {
     k += 1
     let node = walker.currentNode
 
-    console.log(k, node)
-
     if (k in m === false) continue
 
     for (const entry of m[k]) {
