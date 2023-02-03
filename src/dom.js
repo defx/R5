@@ -109,7 +109,9 @@ export const update = (templateResult, rootNode) => {
             case CONDITIONAL_BLOCK: {
               const { rendered } = Placeholder.getMeta(node)
               if (rendered) return
-              const block = ConditionalBlocks.create(value.t)
+              const block = ConditionalBlocks.create(value.t, {
+                id: Date.now(),
+              })
               node.after(...block.nodes)
               return
             }
@@ -166,6 +168,15 @@ export const update = (templateResult, rootNode) => {
           }
         } else {
           if (placeholderType !== EMPTY) {
+            // downgrade...
+            switch (placeholderType) {
+              case CONDITIONAL_BLOCK: {
+                const blocks = ConditionalBlocks.get(node)
+                blocks.forEach(ConditionalBlocks.remove)
+                break
+              }
+            }
+
             const placeholder = Placeholder.create(EMPTY)
             node.replaceWith(placeholder)
             return placeholder.nextSibling

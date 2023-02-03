@@ -300,7 +300,11 @@ describe("define()", () => {
 
     $(name).$dispatch({ type: "set", payload: { showBlock: true } })
 
-    // assert.equal($("h1").textContent, `hello! 👋`)
+    assert.equal($("h1").textContent, `hello! 👋`)
+
+    $(name).$dispatch({ type: "set", payload: { showBlock: false } })
+
+    assert.notOk($("h1"))
   })
 
   it("primitive arrays", () => {

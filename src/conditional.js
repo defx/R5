@@ -6,10 +6,9 @@ import {
 } from "./placeholder.js"
 
 export function create(stringTemplate, meta = {}) {
+  const metaJSON = JSON.stringify(meta)
   const { childNodes: nodes } = templateNodeFromString(
-    `<!-- {{ ${CONDITIONAL_BLOCK_OPEN}:meta(${JSON.stringify(
-      meta
-    )}) }} -->${stringTemplate}<!-- {{ ${CONDITIONAL_BLOCK_CLOSE}:meta(${meta}) }} -->`
+    `<!-- {{ ${CONDITIONAL_BLOCK_OPEN}:meta(${metaJSON}) }} -->${stringTemplate}<!-- {{ ${CONDITIONAL_BLOCK_CLOSE}:meta(${metaJSON}) }} -->`
   ).content.cloneNode(true)
 
   return {
@@ -23,11 +22,12 @@ export function remove(block) {
 }
 
 export function get(placeholder) {
-  const { id, length = 0 } = Placeholder.getMeta(placeholder)
+  const { id } = Placeholder.getMeta(placeholder)
 
-  if (!id || length === 0) return []
+  if (!id) return []
   const blocks = []
   let open = false
+
   walk(
     placeholder.nextSibling,
     (node) => {
@@ -35,20 +35,23 @@ export function get(placeholder) {
       if (node.nodeType === Node.COMMENT_NODE) {
         const type = Placeholder.type(node)
 
-        if (type === BLOCK_OPEN) {
+        if (type === CONDITIONAL_BLOCK_OPEN) {
           const meta = Placeholder.getMeta(node)
-          if (meta.groupId === id) {
+          if (meta.id === id) {
             open = true
             blocks.push({
-              id: meta.id,
+              meta,
               nodes: [node],
             })
           }
         }
-        if (type === BLOCK_CLOSE && Placeholder.getMeta(node).groupId === id) {
+        if (
+          type === CONDITIONAL_BLOCK_CLOSE &&
+          Placeholder.getMeta(node).id === id
+        ) {
           last(blocks).nodes.push(node)
           open = false
-          if (blocks.length === length) {
+          if (blocks.length === 1) {
             // stop looking
             return false
           }
