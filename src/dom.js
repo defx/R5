@@ -121,22 +121,22 @@ export const update = (templateResult, rootNode) => {
               const meta = Placeholder.getMeta(node)
               const blocks = Blocks.get(node)
               const groupId = meta.id
-              const prevIds = blocks.map(({ id }) => id)
+              const prevIds = blocks.map(({ meta: { id } }) => id)
               const nextIds = value.map(({ $key }) => $key)
               const removals = prevIds
                 .filter((id) => nextIds.includes(id) === false)
-                .map((id) => blocks.find((block) => block.id === id))
+                .map((id) => blocks.find((block) => block.meta.id === id))
 
               removals.forEach(Blocks.remove)
 
               const nextBlocks = nextIds.map((id, i) => {
                 if (id !== null) {
                   return (
-                    blocks.find((block) => block.id === id) ||
-                    Blocks.create(groupId, id, value[i].t)
+                    blocks.find((block) => block.meta.id === id) ||
+                    Blocks.create(value[i].t, { groupId, id })
                   )
                 } else {
-                  return blocks[i] || Blocks.create(groupId, id, value[i].t)
+                  return blocks[i] || Blocks.create(value[i].t, { groupId, id })
                 }
               })
 

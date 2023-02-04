@@ -2,15 +2,14 @@ import { last, templateNodeFromString, walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
 import { BLOCK_OPEN, BLOCK_CLOSE } from "./placeholder.js"
 
-export function create(groupId, id, stringTemplate) {
-  const meta = JSON.stringify({ id, groupId })
-
+export function create(stringTemplate, meta = {}) {
+  const metaJSON = JSON.stringify(meta)
   const { childNodes: nodes } = templateNodeFromString(
-    `<!-- {{ BLOCK_OPEN:meta(${meta}) }} -->${stringTemplate}<!-- {{ BLOCK_CLOSE:meta(${meta}) }} -->`
+    `<!-- {{ ${BLOCK_OPEN}:meta(${metaJSON}) }} -->${stringTemplate}<!-- {{ ${BLOCK_CLOSE}:meta(${metaJSON}) }} -->`
   ).content.cloneNode(true)
 
   return {
-    id,
+    meta,
     nodes,
   }
 }
@@ -37,7 +36,7 @@ export function get(placeholder) {
           if (meta.groupId === id) {
             open = true
             blocks.push({
-              id: meta.id,
+              meta,
               nodes: [node],
             })
           }
