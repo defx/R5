@@ -1,36 +1,18 @@
-import { configure } from "./store.js"
+export { html } from "./template.js"
 import { update } from "./dom.js"
 import { templateNodeFromString } from "./helpers.js"
 
-export { html } from "./template.js"
-
-export const define = (name, factory) => {
-  if (customElements?.get(name)) return
-
-  customElements.define(
-    name,
-    class extends HTMLElement {
-      async connectedCallback() {
-        let config = factory(this)
-
-        if (config instanceof Promise) config = await config
-
-        const { dispatch, getState, onChange, updated, refs } = configure(
-          config,
-          this
-        )
-
-        const result = config.render(getState())
-        const frag = templateNodeFromString(result.t).content.cloneNode(true)
-
-        update(result, frag.firstChild)
-
-        this.prepend(frag)
-
-        onChange((state) => update(config.render(state), this.firstChild))
-
-        this.$dispatch = dispatch
-      }
+export function setup(parentNode, fn) {
+  let initialised = false
+  return function render(...args) {
+    const result = fn(...args)
+    if (!initialised) {
+      const frag = templateNodeFromString(result.t).content.cloneNode(true)
+      update(result, frag.firstChild)
+      parentNode.prepend(frag)
+      initialised = true
+    } else {
+      update(result, parentNode.firstChild)
     }
-  )
+  }
 }
