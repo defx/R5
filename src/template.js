@@ -46,20 +46,14 @@ function parse(str) {
   const template = document.createElement("template")
   template.innerHTML = str.replace(/\n\s*/gm, "")
 
-  // console.log("PARSE", str)
-
   walk(template.content.firstChild, (node) => {
     k += 1
-
-    // console.log("PARSE.node", node, k)
 
     if (node.nodeType === Node.TEXT_NODE) {
       const { textContent } = node
       if (!hasMustache(textContent)) {
         return
       }
-
-      // console.log("TEXT", node, k)
 
       const parts = getParts(textContent)
       const frag = document.createDocumentFragment()
@@ -84,20 +78,14 @@ function parse(str) {
         }
       }
 
-      // const { nextSibling } = node
-
       const nextSibling = node.nextSibling || node.parentNode.nextSibling
 
       node.parentNode.replaceChild(frag, node)
-
-      // console.log(nextSibling)
 
       return nextSibling
     }
 
     if (node.nodeType === Node.ELEMENT_NODE) {
-      // k += 1
-
       let attrs = [...node.attributes]
       let i = attrs.length
 
@@ -119,8 +107,6 @@ function parse(str) {
       }
     }
   })
-
-  // console.log("MAP", map)
 
   return {
     m: map,

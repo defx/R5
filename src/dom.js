@@ -48,8 +48,6 @@ export const update = (templateResult, rootNode) => {
   walk(rootNode, (node) => {
     k += 1
 
-    // console.log("NODE", node, k, m[k])
-
     if (k in m === false) return
 
     for (const entry of m[k]) {
