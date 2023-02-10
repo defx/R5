@@ -1,6 +1,6 @@
+import { BLOCK_OPEN, BLOCK_CLOSE } from "./constants.js"
 import { last, templateNodeFromString, walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
-import { BLOCK_OPEN, BLOCK_CLOSE } from "./placeholder.js"
 
 export function create(stringTemplate, meta = {}) {
   const metaJSON = JSON.stringify(meta)

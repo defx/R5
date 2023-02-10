@@ -1,9 +1,14 @@
+import {
+  EMPTY,
+  REPEATED_BLOCK,
+  CONDITIONAL_BLOCK,
+  STATIC,
+  DYNAMIC,
+} from "./constants.js"
 import { last, walk } from "./helpers.js"
 import { TEXT } from "./template.js"
-import { STATIC, DYNAMIC } from "./token.js"
 import * as Placeholder from "./placeholder.js"
 import * as Blocks from "./blocks.js"
-import { EMPTY, REPEATED_BLOCK, CONDITIONAL_BLOCK } from "./placeholder.js"
 import * as ConditionalBlocks from "./conditional.js"
 
 function isTemplateResult(v) {

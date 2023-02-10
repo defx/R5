@@ -1,10 +1,7 @@
-import { hasMustache, getParts, STATIC, DYNAMIC } from "./token.js"
+import { ATTRIBUTE, STATIC, DYNAMIC } from "./constants.js"
+import { hasMustache, getParts } from "./token.js"
 import { walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
-
-export const ATTRIBUTE = "ATTRIBUTE"
-export const TEXT = "TEXT"
-export const KEY = "KEY"
 
 function last(v) {
   return v[v.length - 1]

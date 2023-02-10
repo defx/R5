@@ -1,11 +1,3 @@
-export const EMPTY = "EMPTY"
-export const REPEATED_BLOCK = "REPEATED_BLOCK"
-export const BLOCK_OPEN = "BLOCK_OPEN"
-export const BLOCK_CLOSE = "BLOCK_CLOSE"
-export const CONDITIONAL_BLOCK_OPEN = "CONDITIONAL_BLOCK_OPEN"
-export const CONDITIONAL_BLOCK_CLOSE = "CONDITIONAL_BLOCK_CLOSE"
-export const CONDITIONAL_BLOCK = "CONDITIONAL_BOCK"
-
 export function type({ textContent = "" }) {
   return textContent.match(/^\s*{{\s*([^\s:]+)/m)?.[1]
 }

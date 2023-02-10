@@ -2,7 +2,7 @@ export { html } from "./template.js"
 import { update } from "./dom.js"
 import { templateNodeFromString } from "./helpers.js"
 
-export function setup(parentNode, fn) {
+export function construct(parentNode, fn) {
   let initialised = false
   return function render(...args) {
     const result = fn(...args)
