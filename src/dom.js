@@ -1,4 +1,5 @@
 import {
+  TEXT,
   EMPTY,
   REPEATED_BLOCK,
   CONDITIONAL_BLOCK,
@@ -6,7 +7,6 @@ import {
   DYNAMIC,
 } from "./constants.js"
 import { last, walk } from "./helpers.js"
-import { TEXT } from "./template.js"
 import * as Placeholder from "./placeholder.js"
 import * as Blocks from "./blocks.js"
 import * as ConditionalBlocks from "./conditional.js"
