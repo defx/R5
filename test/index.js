@@ -53,6 +53,22 @@ describe("construct", () => {
     const render = construct(
       rootNode,
       (items) => html`<ul>
+        ${items.map(({ id, name }) => html`<li>${name}</li>`)}
+      </ul>`
+    )
+    render([
+      { id: 1, name: "Kim" },
+      { id: 2, name: "Matt" },
+    ])
+
+    assert.equal(rootNode.querySelectorAll("li").length, 2)
+    assert.equal(rootNode.textContent, "KimMatt")
+  })
+
+  it("reorders keyed lists", () => {
+    const render = construct(
+      rootNode,
+      (items) => html`<ul>
         ${items.map(({ id, name }) => html`<li>${name}</li>`.key(id))}
       </ul>`
     )
