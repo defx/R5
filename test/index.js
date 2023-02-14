@@ -110,7 +110,7 @@ describe("construct", () => {
   })
 
   it("listens to events", () => {
-    const render = construct(rootNode, (fn) => html`<a @onclick="${fn}"></a>`)
+    const render = construct(rootNode, (fn) => html`<a onclick="${fn}"></a>`)
     let x
     render(() => (x = "foo"))
     rootNode.children[0].click()

@@ -103,8 +103,8 @@ function parse(str) {
 
         map[k] = map[k] || []
         map[k].push(
-          name.startsWith("@on")
-            ? { type: EVENT, name: name.slice(3), index: parts[0].index }
+          name.startsWith("on")
+            ? { type: EVENT, name: name.slice(2), index: parts[0].index }
             : {
                 type: ATTRIBUTE,
                 name,
