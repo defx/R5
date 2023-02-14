@@ -1,4 +1,4 @@
-import { ATTRIBUTE, STATIC, DYNAMIC } from "./constants.js"
+import { ATTRIBUTE, DYNAMIC, EMPTY, STATIC } from "./constants.js"
 import { hasMustache, getParts } from "./token.js"
 import { walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
@@ -73,7 +73,7 @@ function parse(str) {
           frag.appendChild(text)
         }
         if (part.type === DYNAMIC) {
-          const placeholder = Placeholder.create("EMPTY")
+          const placeholder = Placeholder.create(EMPTY)
           frag.appendChild(placeholder)
 
           map[k] = map[k] || []
