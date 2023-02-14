@@ -1,6 +1,8 @@
 import {
+  ATTRIBUTE,
   TEXT,
   EMPTY,
+  EVENT,
   REPEATED_BLOCK,
   CONDITIONAL_BLOCK,
   STATIC,
@@ -57,20 +59,37 @@ export const update = (templateResult, rootNode) => {
 
     for (const entry of m[k]) {
       if (node.nodeType === Node.ELEMENT_NODE) {
-        const { name, parts } = entry
+        switch (entry.type) {
+          case ATTRIBUTE: {
+            const { name, parts } = entry
 
-        const value = parts.reduce((a, part) => {
-          if (part.type === DYNAMIC) {
-            return a + v[part.index]
-          }
-          if (part.type === STATIC) {
-            return a + part.value
-          }
-          return a
-        }, "")
+            const value = parts.reduce((a, part) => {
+              if (part.type === DYNAMIC) {
+                return a + v[part.index]
+              }
+              if (part.type === STATIC) {
+                return a + part.value
+              }
+              return a
+            }, "")
 
-        if (node.getAttribute(name) !== value) {
-          node.setAttribute(name, value)
+            if (node.getAttribute(name) !== value) {
+              node.setAttribute(name, value)
+            }
+            break
+          }
+          case EVENT: {
+            const { name, index } = entry
+
+            if (!node.$listening) {
+              node.addEventListener(name, (e) => node.$handler?.(e))
+              node.$listening = true
+            }
+
+            node.$handler = v[index]
+
+            break
+          }
         }
       } else {
         // TEXT, COMMENT

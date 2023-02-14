@@ -10,3 +10,4 @@ export const TEXT = 9
 export const KEY = 10
 export const STATIC = 11
 export const DYNAMIC = 12
+export const EVENT = 13

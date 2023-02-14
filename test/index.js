@@ -108,4 +108,16 @@ describe("construct", () => {
     assert.equal(rootNode.textContent, "ErickaTheaMattKim")
     assert.equal(li2[3], kim)
   })
+
+  it("listens to events", () => {
+    const render = construct(rootNode, (fn) => html`<a @onclick="${fn}"></a>`)
+    let x
+    render(() => (x = "foo"))
+    rootNode.children[0].click()
+    assert.equal(x, "foo")
+    render(() => (x = "bar"))
+    rootNode.children[0].click()
+    assert.equal(x, "bar")
+    /* @todo: assert that there is only one listener */
+  })
 })

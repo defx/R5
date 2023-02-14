@@ -1,4 +1,4 @@
-import { ATTRIBUTE, DYNAMIC, EMPTY, STATIC } from "./constants.js"
+import { ATTRIBUTE, DYNAMIC, EMPTY, EVENT, STATIC } from "./constants.js"
 import { hasMustache, getParts } from "./token.js"
 import { walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
@@ -102,11 +102,15 @@ function parse(str) {
         const parts = getParts(value)
 
         map[k] = map[k] || []
-        map[k].push({
-          type: ATTRIBUTE,
-          name,
-          parts,
-        })
+        map[k].push(
+          name.startsWith("@on")
+            ? { type: EVENT, name: name.slice(3), index: parts[0].index }
+            : {
+                type: ATTRIBUTE,
+                name,
+                parts,
+              }
+        )
 
         node.removeAttribute(name)
       }
