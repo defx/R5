@@ -48,4 +48,48 @@ describe("construct", () => {
     render({ one: "foo", two: "bar" })
     assert(rootNode.children[0].getAttribute("class"), "foo bar")
   })
+
+  it("renders lists", () => {
+    const render = construct(
+      rootNode,
+      (items) => html`<ul>
+        ${items.map(({ id, name }) => html`<li>${name}</li>`.key(id))}
+      </ul>`
+    )
+    render([
+      { id: 1, name: "Kim" },
+      { id: 2, name: "Matt" },
+    ])
+
+    assert.equal(rootNode.querySelectorAll("li").length, 2)
+    assert.equal(rootNode.textContent, "KimMatt")
+
+    render([
+      { id: 1, name: "Kim" },
+      { id: 2, name: "Matt" },
+      { id: 3, name: "Thea" },
+      { id: 4, name: "Ericka" },
+    ])
+
+    const li = [...rootNode.querySelectorAll("li")]
+
+    assert.equal(li.length, 4)
+    assert.equal(rootNode.textContent, "KimMattTheaEricka")
+
+    const [kim] = li
+
+    render(
+      [
+        { id: 1, name: "Kim" },
+        { id: 2, name: "Matt" },
+        { id: 3, name: "Thea" },
+        { id: 4, name: "Ericka" },
+      ].reverse()
+    )
+
+    const li2 = [...rootNode.querySelectorAll("li")]
+
+    assert.equal(rootNode.textContent, "ErickaTheaMattKim")
+    assert.equal(li2[3], kim)
+  })
 })
