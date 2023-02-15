@@ -126,6 +126,6 @@ describe("render", () => {
     render(html`<a onclick="${() => (x = "bar")}"></a>`, rootNode)
     rootNode.children[0].click()
     assert.equal(x, "bar")
-    /* @todo: assert that there is only one listener */
+    /* @todo: spy on addEventListener to prove that it is only called once */
   })
 })
