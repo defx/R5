@@ -1,16 +1,12 @@
 import { ATTRIBUTE, DYNAMIC, EMPTY, EVENT, STATIC } from "./constants.js"
 import { hasMustache, getParts } from "./token.js"
-import { walk } from "./helpers.js"
+import { last, walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
-
-function last(v) {
-  return v[v.length - 1]
-}
 
 function withPlaceholders(strings) {
   return (
     strings.slice(0, -1).reduce((a, s, i) => {
-      return a + s + `{{ ${i} }}`
+      return a + s + `{{${i}}}`
     }, "") + last(strings)
   ).trim()
 }
