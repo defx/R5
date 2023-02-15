@@ -65,6 +65,10 @@ export const update = (templateResult, rootNode) => {
 
             const value = parts.reduce((a, part) => {
               if (part.type === DYNAMIC) {
+                const x = v[part.index]
+
+                if (!a && typeof x === "boolean") return x
+
                 return a + v[part.index]
               }
               if (part.type === STATIC) {
@@ -72,6 +76,15 @@ export const update = (templateResult, rootNode) => {
               }
               return a
             }, "")
+
+            if (typeof value === "boolean") {
+              if (value) {
+                node.setAttribute(name, "")
+              } else {
+                node.removeAttribute(name)
+              }
+              break
+            }
 
             if (node.getAttribute(name) !== value) {
               node.setAttribute(name, value)

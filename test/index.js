@@ -36,7 +36,14 @@ describe("construct", () => {
 
   it("sets attributes", () => {
     render(html`<p class="${"foo"} ${"bar"}"></p>`, rootNode)
-    assert(rootNode.children[0].getAttribute("class"), "foo bar")
+    assert.equal(rootNode.children[0].getAttribute("class"), "foo bar")
+  })
+
+  it("sets boolean attributes", () => {
+    render(html`<p hidden="${false}"></p>`, rootNode)
+    assert.equal(rootNode.children[0].hidden, false)
+    render(html`<p hidden="${true}"></p>`, rootNode)
+    assert.equal(rootNode.children[0].hidden, true)
   })
 
   it("renders lists", () => {
