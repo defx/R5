@@ -48,7 +48,14 @@ function parse(str) {
         return
       }
 
+      /*
+      
+      the following code replaces all of the dynamic parts of text nodes with comment placeholders....which can all be done without DOM. 
+      
+      */
+
       const parts = getParts(textContent)
+
       const frag = document.createDocumentFragment()
 
       let k2 = k
