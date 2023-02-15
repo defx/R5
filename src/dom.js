@@ -77,7 +77,7 @@ export const update = (templateResult, rootNode) => {
               return a
             }, "")
 
-            if (typeof value === "boolean") {
+            if (typeof value === "boolean" && !name.startsWith("aria-")) {
               if (value) {
                 node.setAttribute(name, "")
               } else {

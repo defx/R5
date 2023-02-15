@@ -39,11 +39,18 @@ describe("construct", () => {
     assert.equal(rootNode.children[0].getAttribute("class"), "foo bar")
   })
 
-  it("sets boolean attributes", () => {
+  it("toggles boolean attributes", () => {
     render(html`<p hidden="${false}"></p>`, rootNode)
-    assert.equal(rootNode.children[0].hidden, false)
+    assert.equal(rootNode.children[0].hasAttribute("hidden"), false)
     render(html`<p hidden="${true}"></p>`, rootNode)
-    assert.equal(rootNode.children[0].hidden, true)
+    assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
+  })
+
+  it("sets truthy/falsy aria-* attributes", () => {
+    render(html`<p aria-hidden="${false}"></p>`, rootNode)
+    assert.equal(rootNode.children[0].getAttribute("aria-hidden"), "false")
+    render(html`<p aria-hidden="${true}"></p>`, rootNode)
+    assert.equal(rootNode.children[0].getAttribute("aria-hidden"), "true")
   })
 
   it("renders lists", () => {
