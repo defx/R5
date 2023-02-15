@@ -14,10 +14,10 @@ function withPlaceholders(strings) {
 const cache = new Map()
 
 export function html(strings, ...values) {
-  const key = strings.join("{{ ? }}").trim()
+  const key = withPlaceholders(strings)
 
   if (!cache.has(key)) {
-    cache.set(key, parse(withPlaceholders(strings)))
+    cache.set(key, parse(key))
   }
 
   return {
