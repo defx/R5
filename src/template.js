@@ -2,8 +2,6 @@ import { ATTRIBUTE, DYNAMIC, EMPTY, EVENT, STATIC } from "./constants.js"
 import { hasMustache, getParts } from "./token.js"
 import { walk } from "./helpers.js"
 import * as Placeholder from "./placeholder.js"
-import { update } from "./dom.js"
-import { templateNodeFromString } from "./helpers.js"
 
 function last(v) {
   return v[v.length - 1]
@@ -18,12 +16,6 @@ function withPlaceholders(strings) {
 }
 
 const cache = new Map()
-
-function mount(rootNode) {
-  const frag = templateNodeFromString(this.t).content.cloneNode(true)
-  update(result, frag.firstChild)
-  rootNode.appendChild(frag)
-}
 
 export function html(strings, ...values) {
   const key = strings.join("{{ ? }}").trim()
