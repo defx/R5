@@ -145,6 +145,7 @@ export const update = (templateResult, rootNode) => {
               const groupId = meta.id
               const prevIds = blocks.map(({ meta: { id } }) => id)
               const nextIds = value.map(({ $key }) => $key)
+
               const removals = prevIds
                 .filter((id) => nextIds.includes(id) === false)
                 .map((id) => blocks.find((block) => block.meta.id === id))

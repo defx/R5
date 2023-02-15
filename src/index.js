@@ -2,17 +2,17 @@ export { html } from "./template.js"
 import { update } from "./dom.js"
 import { templateNodeFromString } from "./helpers.js"
 
-export function construct(parentNode, fn) {
-  let initialised = false
-  return function render(...args) {
-    const result = fn(...args)
-    if (!initialised) {
-      const frag = templateNodeFromString(result.t).content.cloneNode(true)
-      update(result, frag.firstChild)
-      parentNode.prepend(frag)
-      initialised = true
-    } else {
-      update(result, parentNode.firstChild)
-    }
+const nodes = new WeakSet()
+
+export function render(templateResult, rootNode) {
+  if (!nodes.has(rootNode)) {
+    const frag = templateNodeFromString(templateResult.t).content.cloneNode(
+      true
+    )
+    update(templateResult, frag.firstChild)
+    rootNode.prepend(frag)
+    nodes.add(rootNode)
+  } else {
+    update(templateResult, rootNode.firstChild)
   }
 }

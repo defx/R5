@@ -1,4 +1,4 @@
-import { construct, html } from "../src/index.js"
+import { html, render } from "../src/index.js"
 
 describe("construct", () => {
   let rootNode
@@ -13,79 +13,70 @@ describe("construct", () => {
   })
 
   it("renders static content", () => {
-    construct(
-      rootNode,
-      () =>
-        html`<!-- hello world! -->
-          <p>hi</p>`
-    )()
+    render(
+      html`<!-- hello world! -->
+        <p>hi</p>`,
+      rootNode
+    )
 
     assert.equal(rootNode.innerHTML, "<!-- hello world! --><p>hi</p>")
   })
 
   it("sets text", () => {
-    const render = construct(rootNode, (value) => html`<p>${value}</p>`)
-
-    render(0)
+    render(html`<p>${0}</p>`, rootNode)
     assert.equal(rootNode.children[0].textContent, "0")
   })
 
   it("reuses nodes", () => {
-    const render = construct(rootNode, (value) => html`<p>${value}</p>`)
-
-    render(0)
+    render(html`<p>${0}</p>`, rootNode)
     const p = rootNode.children[0]
-    render(1)
+    render(html`<p>${1}</p>`, rootNode)
     assert.equal(rootNode.children[0], p)
   })
 
   it("sets attributes", () => {
-    const render = construct(
-      rootNode,
-      ({ one, two }) => html`<p class="${one} ${two}"></p>`
-    )
-
-    render({ one: "foo", two: "bar" })
+    render(html`<p class="${"foo"} ${"bar"}"></p>`, rootNode)
     assert(rootNode.children[0].getAttribute("class"), "foo bar")
   })
 
   it("renders lists", () => {
-    const render = construct(
-      rootNode,
-      (items) => html`<ul>
-        ${items.map(({ id, name }) => html`<li>${name}</li>`)}
-      </ul>`
+    render(
+      html`<ul>
+        ${[{ name: "Kim" }, { name: "Matt" }].map(
+          ({ name }) => html`<li>${name}</li>`
+        )}
+      </ul>`,
+      rootNode
     )
-    render([
-      { id: 1, name: "Kim" },
-      { id: 2, name: "Matt" },
-    ])
-
     assert.equal(rootNode.querySelectorAll("li").length, 2)
     assert.equal(rootNode.textContent, "KimMatt")
   })
 
   it("reorders keyed lists", () => {
-    const render = construct(
-      rootNode,
-      (items) => html`<ul>
-        ${items.map(({ id, name }) => html`<li>${name}</li>`.key(id))}
-      </ul>`
+    const tpl = (items) => html`<ul>
+      ${items.map(({ id, name }) => html`<li>${name}</li>`.key(id))}
+    </ul>`
+
+    render(
+      tpl([
+        { id: 1, name: "Kim" },
+        { id: 2, name: "Matt" },
+      ]),
+      rootNode
     )
-    render([
-      { id: 1, name: "Kim" },
-      { id: 2, name: "Matt" },
-    ])
 
     assert.equal(rootNode.querySelectorAll("li").length, 2)
     assert.equal(rootNode.textContent, "KimMatt")
 
-    render([
-      { id: 1, name: "Kim" },
-      { id: 2, name: "Matt" },
-      { id: 3, name: "Thea" },
-      { id: 4, name: "Ericka" },
-    ])
+    render(
+      tpl([
+        { id: 1, name: "Kim" },
+        { id: 2, name: "Matt" },
+        { id: 3, name: "Thea" },
+        { id: 4, name: "Ericka" },
+      ]),
+      rootNode
+    )
 
     const li = [...rootNode.querySelectorAll("li")]
 
@@ -95,12 +86,15 @@ describe("construct", () => {
     const [kim] = li
 
     render(
-      [
-        { id: 1, name: "Kim" },
-        { id: 2, name: "Matt" },
-        { id: 3, name: "Thea" },
-        { id: 4, name: "Ericka" },
-      ].reverse()
+      tpl(
+        [
+          { id: 1, name: "Kim" },
+          { id: 2, name: "Matt" },
+          { id: 3, name: "Thea" },
+          { id: 4, name: "Ericka" },
+        ].reverse()
+      ),
+      rootNode
     )
 
     const li2 = [...rootNode.querySelectorAll("li")]
@@ -110,12 +104,12 @@ describe("construct", () => {
   })
 
   it("listens to events", () => {
-    const render = construct(rootNode, (fn) => html`<a onclick="${fn}"></a>`)
     let x
-    render(() => (x = "foo"))
+
+    render(html`<a onclick="${() => (x = "foo")}"></a>`, rootNode)
     rootNode.children[0].click()
     assert.equal(x, "foo")
-    render(() => (x = "bar"))
+    render(html`<a onclick="${() => (x = "bar")}"></a>`, rootNode)
     rootNode.children[0].click()
     assert.equal(x, "bar")
     /* @todo: assert that there is only one listener */
