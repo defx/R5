@@ -1,6 +1,6 @@
 # R5
 
-Minimalist HTML templating library with declarative data/event binding and reactive updates, using standard ES Template Literals.
+Minimalist HTML templating library with declarative data and event binding and reactive updates, using standard ES Template Literals.
 
 ## Agnostic
 
