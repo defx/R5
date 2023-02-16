@@ -1,3 +1,6 @@
+import { ATTRIBUTE, DYNAMIC, EMPTY, EVENT, STATIC } from "../src/constants.js"
+import { hasMustache, getParts } from "../src/token.js"
+
 const parts = [
   `<p class="`,
   `{{0}}`,
@@ -41,33 +44,69 @@ i think you can just count
   let text = ""
   let attr = ""
   let attrName = ""
+  let counter = 0
 
-  chars.forEach((c, i) => {
+  function map(k, v) {
+    m[k] = m[k] || []
+    m[k].push(v)
+  }
+
+  //   function mapText(value) {
+  //     const parts = getParts(value)
+
+  //     let k = counter
+
+  //     for (const [i, part] of Object.entries(parts)) {
+  //       counter = k + +i
+
+  //       if (part.type === STATIC) {
+  //         const text = document.createTextNode(part.value)
+  //         frag.appendChild(text)
+  //       }
+  //       if (part.type === DYNAMIC) {
+  //         const placeholder = Placeholder.create(EMPTY)
+  //         frag.appendChild(placeholder)
+
+  //         map[k] = map[k] || []
+  //         map[k].push({
+  //           index: part.index,
+  //         })
+  //       }
+  //     }
+  //   }
+
+  const html = chars.reduce((html, c, i) => {
     let prev = chars[i - 1]
     let next = chars[i + 1]
 
     if (c === `<`) {
       if (next === `/`) {
-        console.log("start close tag", { text })
         t = 0
         e = 1
-        // @todo: emit text
+        if (text) {
+          map(counter, {
+            type: "TEXT",
+            value: text,
+          })
+        }
         text = ""
       } else {
-        console.log("start open tag", { text })
+        if (text) {
+          map(counter, {
+            type: "TEXT",
+            value: text,
+          })
+        }
         t = 1
         e = 1
-        // @todo: emit text
-
+        counter++
         text = ""
       }
     } else if (c === `>`) {
       if (t == 1) {
-        console.log("end open tag")
         e = 0
       }
       if (t === 0) {
-        console.log("end close tag")
         e = 0
       }
     } else if (c.match(/['"]/)) {
@@ -76,32 +115,37 @@ i think you can just count
           .slice(0, i - 1)
           .split(" ")
           .pop()
-
-        console.log("open attribute")
         t = 2
       } else if (t === 2) {
-        console.log("close attribute", { name: attrName, value: attr })
-        // @todo: emit attribute
+        map(counter, {
+          type: "ATTRIBUTE",
+          name: attrName,
+          value: attr,
+        })
         attr = ""
         attrName = ""
         t = 1
       }
     } else if (e === 0) {
+      if (!text) counter++
       text += c
-      console.log("text", c)
     } else if (t === 2) {
       attr += c
     }
+
+    return html + c
   })
 
   // ...
-  return { m }
+  return { m, t: html }
 }
 
 describe("parse", () => {
   it("...", () => {
     const html = `<section><p class="{{0}} foo">{{1}}and{{2}}</p>{{3}}<a onclick='{{4}}'>{{5}}and{{6}}</a></section><span>{{7}}</span>`
 
-    const { m } = parse(html)
+    const { m, t } = parse(html)
+
+    console.log(t, JSON.stringify(m, null, 2))
   })
 })
