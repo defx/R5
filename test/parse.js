@@ -1,20 +1,3 @@
-import { ATTRIBUTE, DYNAMIC, EMPTY, EVENT, STATIC } from "../src/constants.js"
-import { hasMustache, getParts } from "../src/token.js"
-
-const parts = [
-  `<p class="`,
-  `{{0}}`,
-  `">`,
-  `{{1}}`,
-  `</p>`,
-  `{{2}}`,
-  `<a onclick='`,
-  `{{3}}`,
-  `'>`,
-  `{{4}}`,
-  `</a>`,
-]
-
 function parse(str) {
   const m = {}
   const chars = str.split("")
@@ -51,29 +34,9 @@ i think you can just count
     m[k].push(v)
   }
 
-  //   function mapText(value) {
-  //     const parts = getParts(value)
-
-  //     let k = counter
-
-  //     for (const [i, part] of Object.entries(parts)) {
-  //       counter = k + +i
-
-  //       if (part.type === STATIC) {
-  //         const text = document.createTextNode(part.value)
-  //         frag.appendChild(text)
-  //       }
-  //       if (part.type === DYNAMIC) {
-  //         const placeholder = Placeholder.create(EMPTY)
-  //         frag.appendChild(placeholder)
-
-  //         map[k] = map[k] || []
-  //         map[k].push({
-  //           index: part.index,
-  //         })
-  //       }
-  //     }
-  //   }
+  function mapText(text) {
+    const parts = text.split(/({{\d+}})/g).filter((v) => v)
+  }
 
   const html = chars.reduce((html, c, i) => {
     let prev = chars[i - 1]
@@ -84,6 +47,10 @@ i think you can just count
         t = 0
         e = 1
         if (text) {
+          console.log(
+            text,
+            text.split(/({{\d+}})/g).filter((v) => v)
+          )
           map(counter, {
             type: "TEXT",
             value: text,
@@ -92,6 +59,10 @@ i think you can just count
         text = ""
       } else {
         if (text) {
+          console.log(
+            text,
+            text.split(/({{\d+}})/g).filter((v) => v)
+          )
           map(counter, {
             type: "TEXT",
             value: text,
