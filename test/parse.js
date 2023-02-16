@@ -16,6 +16,16 @@ function parse(str) {
   const m = {}
   const chars = str.split("")
 
+  /* 
+  
+
+don't over-egg it, all we need is...
+
+1. each attribute: (nodeIndex, name, value)
+2. each text node: (nodeIndex, value)
+  
+  */
+
   let t
 
   chars.forEach((c, i) => {
@@ -30,19 +40,21 @@ function parse(str) {
         console.log("start open tag")
         t = 1
       }
-    }
-    if (c === `>`) {
-      if (t) {
+    } else if (c === `>`) {
+      if (t == 1) {
         console.log("end open tag")
-      } else {
+      }
+      if (t === 0) {
         console.log("end close tag")
       }
-    }
-    if (c.match(/['"]/)) {
+    } else if (c.match(/['"]/)) {
       if (prev === `=`) {
         console.log("open attribute")
-      } else {
+        t = 2
+      } else if (t === 2) {
         console.log("close attribute")
+        // @todo: emit attribute
+        t = 1
       }
     }
   })
