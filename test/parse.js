@@ -18,7 +18,7 @@ function parse(strings) {
     if (openAttr) {
       // ...
     } else {
-      html += `<!--$-->`
+      html += `<!--*-->`
     }
 
     const tags = (html.match(/(<[\w!])/g) || []).length
