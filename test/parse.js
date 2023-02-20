@@ -1,17 +1,40 @@
+// import { ATTRIBUTE, TEXT } from "../src/constants.js"
+
+const ATTRIBUTE = "ATTR"
+const TEXT = "TEXT"
+
 function parse(strings) {
   const m = {}
 
   let html = ""
   let openAttr = false
+  let attrName
+
+  function map(type) {
+    const tags = (html.match(/(<[\w!])/g) || []).length
+    const text = (html.match(/(>[^<]+<)/g) || []).length
+    const k = tags + text
+    const entry = {
+      type,
+    }
+    if (type === ATTRIBUTE) {
+      entry.name = attrName
+    }
+    m[k] = m[k] || []
+    m[k].push(entry)
+  }
 
   strings.forEach((str, i) => {
+    html += str
+
     if (openAttr) {
       openAttr = !!!str.match(/['"]/)
+      if (!openAttr) map(ATTRIBUTE)
     } else {
-      openAttr = !!str.match(/\w+=['"]{1}[^'"]*$/)
+      const m = str.match(/(\w+)=['"]{1}[^'"]*$/)
+      if (m) attrName = m[1]
+      openAttr = !!m
     }
-
-    html += str
 
     if (i === strings.length - 1) return
 
@@ -19,17 +42,8 @@ function parse(strings) {
       // ...
     } else {
       html += `<!--*-->`
+      map(TEXT)
     }
-
-    const tags = (html.match(/(<[\w!])/g) || []).length
-    const text = (html.match(/(>[^<]+<)/g) || []).length
-    const nodes = tags + text
-    const type = openAttr ? "ATTRIBUTE" : "TEXT"
-
-    console.log(html, {
-      type,
-      i: nodes,
-    })
   })
 
   // ...
@@ -38,11 +52,12 @@ function parse(strings) {
 
 describe("parse", () => {
   it("...", () => {
-    const html = `<section><p class="{{0}} foo">{{1}}and{{2}}</p>{{3}}<a onclick='{{4}}'>{{5}}and{{6}}</a></section><span>{{7}}</span>`
+    const html = `<section><p class="foo {{0}} bar">{{1}}and{{2}}</p>{{3}}<a onclick='{{4}}'>{{5}}and{{6}}</a></section><span>{{7}}</span>`
 
     const parts = [
       `<section><p class="`,
-      ` foo">`,
+      `foo `,
+      ` bar">`,
       `and`,
       `</p>`,
       `<a onclick='`,
