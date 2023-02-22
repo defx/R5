@@ -7,17 +7,7 @@ const getParts = (value) =>
     .filter((v) => v)
     .map((value) => {
       let match = value.match(/{{([^{}]+)}}/)
-
-      if (!match)
-        return {
-          type: STATIC,
-          value,
-        }
-
-      return {
-        type: DYNAMIC,
-        index: +match[1].trim(),
-      }
+      return match ? [1, +match[1].trim()] : [0, value]
     })
 
 const ATTRIBUTE = "ATTR"
