@@ -64,17 +64,13 @@ export const update = (templateResult, rootNode) => {
             const { name, parts } = entry
 
             const value = parts.reduce((a, [type, X]) => {
-              if (type === 1) {
+              if (type === DYNAMIC) {
                 const x = v[X]
-
                 if (!a && typeof x === "boolean") return x
-
                 return a + v[X]
-              }
-              if (type === 0) {
+              } else {
                 return a + X
               }
-              return a
             }, "")
 
             if (typeof value === "boolean" && !name.startsWith("aria-")) {
@@ -93,8 +89,6 @@ export const update = (templateResult, rootNode) => {
           }
           case EVENT: {
             const { name, index } = entry
-
-            console.log("EVENT", node, index)
 
             if (!node.$listening) {
               node.addEventListener(name, (e) => node.$handler?.(e))
