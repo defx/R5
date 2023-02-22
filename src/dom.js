@@ -5,7 +5,6 @@ import {
   EVENT,
   REPEATED_BLOCK,
   CONDITIONAL_BLOCK,
-  STATIC,
   DYNAMIC,
 } from "./constants.js"
 import { last, walk } from "./helpers.js"
@@ -203,7 +202,6 @@ export const update = (templateResult, rootNode) => {
           }
         } else {
           if (placeholderType !== EMPTY) {
-            // downgrade...
             switch (placeholderType) {
               case CONDITIONAL_BLOCK: {
                 const blocks = ConditionalBlocks.get(node)
