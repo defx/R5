@@ -3,7 +3,6 @@ import { parse } from "./parse.js"
 const cache = new Map()
 
 export function html(strings, ...values) {
-  // @todo: replace with a simple(r) join
   const key = strings.join("%")
 
   if (!cache.has(key)) {
