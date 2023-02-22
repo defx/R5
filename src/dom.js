@@ -63,16 +63,16 @@ export const update = (templateResult, rootNode) => {
           case ATTRIBUTE: {
             const { name, parts } = entry
 
-            const value = parts.reduce((a, part) => {
-              if (part.type === DYNAMIC) {
-                const x = v[part.index]
+            const value = parts.reduce((a, [type, X]) => {
+              if (type === 1) {
+                const x = v[X]
 
                 if (!a && typeof x === "boolean") return x
 
-                return a + v[part.index]
+                return a + v[X]
               }
-              if (part.type === STATIC) {
-                return a + part.value
+              if (type === 0) {
+                return a + X
               }
               return a
             }, "")
@@ -94,6 +94,8 @@ export const update = (templateResult, rootNode) => {
           case EVENT: {
             const { name, index } = entry
 
+            console.log("EVENT", node, index)
+
             if (!node.$listening) {
               node.addEventListener(name, (e) => node.$handler?.(e))
               node.$listening = true
@@ -109,8 +111,6 @@ export const update = (templateResult, rootNode) => {
         const value = v[entry.index]
         const valueType = typeOfValue(value)
         let placeholderType = Placeholder.type(node)
-
-        // console.log({ value, valueType })
 
         if (truthy(value)) {
           switch (placeholderType) {

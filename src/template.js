@@ -1,6 +1,7 @@
 import { ATTRIBUTE, DYNAMIC, EMPTY, EVENT, STATIC } from "./constants.js"
 import { hasMustache, getParts } from "./token.js"
 import { last, walk } from "./helpers.js"
+import { parse } from "./parse.js"
 import * as Placeholder from "./placeholder.js"
 
 function withPlaceholders(strings) {
@@ -14,10 +15,11 @@ function withPlaceholders(strings) {
 const cache = new Map()
 
 export function html(strings, ...values) {
+  // @todo: replace with a simple(r) join
   const key = withPlaceholders(strings)
 
   if (!cache.has(key)) {
-    cache.set(key, parse(key))
+    cache.set(key, parse(strings))
   }
 
   return {
@@ -31,7 +33,7 @@ export function html(strings, ...values) {
   }
 }
 
-function parse(str) {
+function xparse(str) {
   const map = {}
 
   let k = -1

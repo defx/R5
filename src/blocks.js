@@ -5,7 +5,7 @@ import * as Placeholder from "./placeholder.js"
 export function create(stringTemplate, meta = {}) {
   const metaJSON = JSON.stringify(meta)
   const { childNodes: nodes } = templateNodeFromString(
-    `<!-- {{ ${BLOCK_OPEN}:meta(${metaJSON}) }} -->${stringTemplate}<!-- {{ ${BLOCK_CLOSE}:meta(${metaJSON}) }} -->`
+    `<!--{{${BLOCK_OPEN}:meta(${metaJSON})}}-->${stringTemplate}<!--{{${BLOCK_CLOSE}:meta(${metaJSON})}}-->`
   ).content.cloneNode(true)
 
   return {

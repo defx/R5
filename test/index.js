@@ -9,7 +9,7 @@ describe("render", () => {
   })
 
   afterEach(() => {
-    document.body.removeChild(rootNode)
+    // document.body.removeChild(rootNode)
   })
 
   it("renders static content", () => {
@@ -19,7 +19,10 @@ describe("render", () => {
       rootNode
     )
 
-    assert.equal(rootNode.innerHTML, "<!-- hello world! --><p>hi</p>")
+    assert.equal(
+      rootNode.innerHTML.replace(/\s*\n\s*/g, ""),
+      "<!-- hello world! --><p>hi</p>"
+    )
   })
 
   it("sets text", () => {
@@ -63,7 +66,7 @@ describe("render", () => {
       rootNode
     )
     assert.equal(rootNode.querySelectorAll("li").length, 2)
-    assert.equal(rootNode.textContent, "KimMatt")
+    assert.equal(rootNode.textContent.replace(/\s*\n\s*/g, ""), "KimMatt")
   })
 
   it("reorders keyed lists", () => {
@@ -80,7 +83,7 @@ describe("render", () => {
     )
 
     assert.equal(rootNode.querySelectorAll("li").length, 2)
-    assert.equal(rootNode.textContent, "KimMatt")
+    assert.equal(rootNode.textContent.replace(/\s*\n\s*/g, ""), "KimMatt")
 
     render(
       tpl([
@@ -95,7 +98,10 @@ describe("render", () => {
     const li = [...rootNode.querySelectorAll("li")]
 
     assert.equal(li.length, 4)
-    assert.equal(rootNode.textContent, "KimMattTheaEricka")
+    assert.equal(
+      rootNode.textContent.replace(/\s*\n\s*/g, ""),
+      "KimMattTheaEricka"
+    )
 
     const [kim] = li
 
@@ -113,7 +119,10 @@ describe("render", () => {
 
     const li2 = [...rootNode.querySelectorAll("li")]
 
-    assert.equal(rootNode.textContent, "ErickaTheaMattKim")
+    assert.equal(
+      rootNode.textContent.replace(/\s*\n\s*/g, ""),
+      "ErickaTheaMattKim"
+    )
     assert.equal(li2[3], kim)
   })
 

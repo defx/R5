@@ -1,5 +1,5 @@
 export function type({ textContent = "" }) {
-  const t = textContent.match(/^\s*{{\s*([^\s:]+)/m)?.[1]
+  const t = textContent.match(/^{{(\d+)/)?.[1]
   return isNaN(t) ? t : +t
 }
 
