@@ -1,5 +1,25 @@
 // import { ATTRIBUTE, TEXT } from "../src/constants.js"
 
+const getParts = (value) =>
+  value
+    .trim()
+    .split(/({{[^{}]+}})/)
+    .filter((v) => v)
+    .map((value) => {
+      let match = value.match(/{{([^{}]+)}}/)
+
+      if (!match)
+        return {
+          type: STATIC,
+          value,
+        }
+
+      return {
+        type: DYNAMIC,
+        index: +match[1].trim(),
+      }
+    })
+
 const ATTRIBUTE = "ATTR"
 const TEXT = "TEXT"
 
@@ -20,7 +40,7 @@ function parse(strings) {
     }
     if (type === ATTRIBUTE) {
       entry.name = attrName
-      entry.value = attrVal
+      entry.parts = getParts(attrVal)
     }
     m[k] = m[k] || []
     m[k].push(entry)
@@ -49,8 +69,8 @@ function parse(strings) {
     if (i === strings.length - 1) return
 
     if (openAttr) {
-      html += `{{ * }}`
-      attrVal += `{{ * }}`
+      html += `{{ ${i} }}`
+      attrVal += `{{ ${i} }}`
     } else {
       html += `<!--*-->`
       map(TEXT)
