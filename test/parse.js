@@ -12,6 +12,7 @@ const getParts = (value) =>
 
 const ATTRIBUTE = "ATTR"
 const TEXT = "TEXT"
+const EMPTY = 1
 
 function parse(strings) {
   const m = {}
@@ -21,7 +22,7 @@ function parse(strings) {
   let attrName
   let attrVal
 
-  function map(type) {
+  function map(type, index) {
     const tags = (html.match(/(<[\w!])/g) || []).length
     const text = (html.match(/(>[^<]+<)/g) || []).length
     const k = tags + text
@@ -31,6 +32,9 @@ function parse(strings) {
     if (type === ATTRIBUTE) {
       entry.name = attrName
       entry.parts = getParts(attrVal)
+    }
+    if (type === TEXT) {
+      entry.index = index
     }
     m[k] = m[k] || []
     m[k].push(entry)
@@ -59,11 +63,11 @@ function parse(strings) {
     if (i === strings.length - 1) return
 
     if (openAttr) {
-      html += `{{ ${i} }}`
-      attrVal += `{{ ${i} }}`
+      html += `{{${i}}}`
+      attrVal += `{{${i}}}`
     } else {
-      html += `<!--*-->`
-      map(TEXT)
+      html += `<!--{{${EMPTY}}}-->`
+      map(TEXT, i)
     }
   })
 

@@ -4,7 +4,7 @@ export function type({ textContent = "" }) {
 }
 
 export function create(type, meta = {}) {
-  const node = document.createComment(`{{ ${type} }}`)
+  const node = document.createComment(`{{${type}}}`)
   return setMeta(node, meta)
 }
 
@@ -15,6 +15,6 @@ export function getMeta(node) {
 
 export function setMeta(node, meta) {
   const t = type(node)
-  node.textContent = `{{ ${t}:meta(${JSON.stringify(meta)}) }}`
+  node.textContent = `{{${t}:meta(${JSON.stringify(meta)})}}`
   return node
 }
