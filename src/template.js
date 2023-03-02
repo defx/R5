@@ -15,10 +15,10 @@ const cache = new Map()
 */
 
 function stars(n) {
-  return new Array(n + 1).fill("*").join("")
+  return new Array(n).fill("*").join("")
 }
 
-function html(strings, ...values) {
+export function html(strings, ...values) {
   const L = values.length - 1
 
   const markup = strings.reduce((markup, string, i) => {
@@ -28,6 +28,8 @@ function html(strings, ...values) {
 
     const isAttr = str.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
 
+    console.log({ string, isAttr, str })
+
     if (isAttr) {
       const startOpenTag = str.lastIndexOf("<")
       const placeholder = str.slice(0, startOpenTag).match(/<!-- (\*+) -->$/)
@@ -35,8 +37,9 @@ function html(strings, ...values) {
       if (placeholder) {
         const n = placeholder[1].length
         str =
-          str.slice(0, startOpenTag) +
-          `<!-- ${stars(n + 1)} -->` +
+          str
+            .slice(0, startOpenTag)
+            .replace(/<!-- (\*+) -->$/, `<!-- ${stars(n + 1)} -->`) +
           str.slice(startOpenTag)
       } else {
         str =
