@@ -14,6 +14,13 @@ const cache = new Map()
 
 */
 
+function stars(n) {
+  return new Array(n + 1)
+    .fill(0)
+    .map(() => `*`)
+    .join("")
+}
+
 function html(strings, ...values) {
   const L = values.length - 1
 
@@ -32,10 +39,7 @@ function html(strings, ...values) {
         const n = placeholder[1].length
         str =
           str.slice(0, startOpenTag) +
-          `<!-- ${new Array(n + 1)
-            .fill(0)
-            .map(() => `*`)
-            .join("")} -->` +
+          `<!-- ${stars(n + 1)} -->` +
           str.slice(startOpenTag)
       } else {
         str =
