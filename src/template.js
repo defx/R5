@@ -18,23 +18,40 @@ function html(strings, ...values) {
   const L = values.length - 1
 
   const markup = strings.reduce((markup, string, i) => {
-    if (i > L) return markup + string
-    const isAttr = string.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
+    let str = markup + string
+
+    if (i > L) return str
+
+    const isAttr = str.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
 
     if (isAttr) {
-      /*
-      
-      @todo: inject comment before the last tag
-      
-      */
-      return markup + string + values[i]
+      const startOpenTag = str.lastIndexOf("<")
+      const placeholder = str.slice(0, startOpenTag).match(/<!-- (\*+) -->$/)
+
+      if (placeholder) {
+        const n = placeholder[1].length
+        str =
+          str.slice(0, startOpenTag) +
+          `<!-- ${new Array(n + 1)
+            .fill(0)
+            .map(() => `*`)
+            .join("")} -->` +
+          str.slice(startOpenTag)
+      } else {
+        str =
+          str.slice(0, startOpenTag) + `<!-- * -->` + str.slice(startOpenTag)
+      }
+
+      return str + values[i]
     }
 
-    return markup + string + "<!-- * -->" + values[i]
+    return str + "<!-- * -->" + values[i]
   }, "")
 
   return markup
 }
+
+// html`<div>${"0"}</div><p class="${"foo"} bar ${"baz"}">${"1"}</p>`
 
 export function xhtml(strings, ...values) {
   const key = strings.join("%")
