@@ -15,10 +15,7 @@ const cache = new Map()
 */
 
 function stars(n) {
-  return new Array(n + 1)
-    .fill(0)
-    .map(() => `*`)
-    .join("")
+  return new Array(n + 1).fill("*").join("")
 }
 
 function html(strings, ...values) {
