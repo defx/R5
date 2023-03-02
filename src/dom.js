@@ -19,9 +19,7 @@ function isTemplateResult(v) {
 function asTemplate(str) {
   let tpl = document.createElement("template")
   tpl.innerHTML = str.trim()
-  if (tpl.content.firstElementChild?.nodeName === "TEMPLATE") {
-    return tpl.content.firstElementChild
-  }
+
   return tpl
 }
 
@@ -55,6 +53,8 @@ export const update = (templateResult, rootNode) => {
     k += 1
 
     if (k in m === false) return
+
+    // @todo: cache node
 
     for (const entry of m[k]) {
       if (node.nodeType === Node.ELEMENT_NODE) {
