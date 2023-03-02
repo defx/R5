@@ -17,23 +17,21 @@ const cache = new Map()
 function html(strings, ...values) {
   const L = values.length - 1
 
-  const markup = strings.map((string, i) => {
-    if (i > L) return string
+  const markup = strings.reduce((markup, string, i) => {
+    if (i > L) return markup + string
     const isAttr = string.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
 
     if (isAttr) {
       /*
       
       @todo: inject comment before the last tag
-
-      - make it reduce ;)
       
       */
-      return string + values[i]
+      return markup + string + values[i]
     }
 
-    return string + "<!-- * -->" + values[i]
-  })
+    return markup + string + "<!-- * -->" + values[i]
+  }, "")
 
   return markup
 }
