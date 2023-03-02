@@ -2,7 +2,43 @@ import { parse } from "./parse.js"
 
 const cache = new Map()
 
-export function html(strings, ...values) {
+/*
+
+<p class="${"foo"} to ${"bar"}">to ${"baz"}</p>
+
+->
+
+<!-- ** -->
+<p class="foo to bar">to <!-- * -->baz</p>
+
+
+*/
+
+function html(strings, ...values) {
+  const L = values.length - 1
+
+  const markup = strings.map((string, i) => {
+    if (i > L) return string
+    const isAttr = string.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
+
+    if (isAttr) {
+      /*
+      
+      @todo: inject comment before the last tag
+
+      - make it reduce ;)
+      
+      */
+      return string + values[i]
+    }
+
+    return string + "<!-- * -->" + values[i]
+  })
+
+  return markup
+}
+
+export function xhtml(strings, ...values) {
   const key = strings.join("%")
 
   if (!cache.has(key)) {
