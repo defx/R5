@@ -86,8 +86,6 @@ describe("render", () => {
     assert.equal(rootNode.querySelectorAll("li").length, 2)
     assert.equal(rootNode.textContent.replace(/\s*\n\s*/g, ""), "KimMatt")
 
-    return
-
     render(
       tpl([
         { id: 1, name: "Kim" },
@@ -99,6 +97,8 @@ describe("render", () => {
     )
 
     const li = [...rootNode.querySelectorAll("li")]
+
+    return
 
     assert.equal(li.length, 4)
     assert.equal(

@@ -12,7 +12,9 @@ function next(node, { before, after, value }) {
   console.log("next", node, node.nextSibling, { isAttr, before, after, value })
 }
 
-export const isPrimitive = (v) => v === null || typeof v !== "object"
+const isTemplateResult = (v) => v?.hasOwnProperty("markup")
+
+const isPrimitive = (v) => v === null || typeof v !== "object"
 
 export const update = (templateResult, rootNode) => {
   const { markup, strings, values } = templateResult
@@ -30,16 +32,16 @@ export const update = (templateResult, rootNode) => {
         const value = values[i]
         i += 1
 
-        if (nextSibling.nodeType === Node.TEXT_NODE) {
-          // it WAS text
-          if (isPrimitive(value)) {
-            // it STILL IS text
+        if (isPrimitive(value)) {
+          if (nextSibling.nodeType === Node.TEXT_NODE) {
             if (nextSibling.textContent !== value) {
               nextSibling.textContent = value
             }
           }
 
           return nextSibling
+        } else if (Array.isArray(value) && isTemplateResult(value[0])) {
+          console.log("repeated block!!")
         }
       }
 

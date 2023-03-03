@@ -23,7 +23,7 @@ function value(v) {
     if (v.hasOwnProperty("markup")) return v.markup
     if (Array.isArray(v)) {
       // probs need to wrap this with two comments
-      return v.map(value).join("")
+      return `<!--{-->${v.map(value).join("")}<!--}-->`
     }
   }
   return `<!--{-->${v}<!--}-->`
