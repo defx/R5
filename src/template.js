@@ -18,6 +18,17 @@ function stars(n) {
   return new Array(n).fill("*").join("")
 }
 
+function value(v) {
+  if (v) {
+    if (v.hasOwnProperty("markup")) return v.markup
+    if (Array.isArray(v)) {
+      // probs need to wrap this with two comments
+      return v.map(value).join("")
+    }
+  }
+  return `<!--{-->${v}<!--}-->`
+}
+
 export function html(strings, ...values) {
   const L = values.length - 1
 
@@ -46,10 +57,17 @@ export function html(strings, ...values) {
       return str + values[i]
     }
 
-    return str + "<!--*-->" + values[i]
+    return str + value(values[i])
   }, "")
 
-  return markup
+  return {
+    markup,
+    strings,
+    values,
+    key() {
+      return this
+    },
+  }
 }
 
 // html`<div>${"0"}</div><p class="${"foo"} bar ${"baz"}">${"1"}</p>`

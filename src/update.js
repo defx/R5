@@ -1,0 +1,64 @@
+import { last, walk } from "./helpers.js"
+
+function next(node, { before, after, value }) {
+  const isAttr = before.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
+
+  if (isAttr) {
+    // ...
+  } else {
+    // ...
+  }
+
+  console.log("next", node, node.nextSibling, { isAttr, before, after, value })
+}
+
+export const isPrimitive = (v) => v === null || typeof v !== "object"
+
+export const update = (templateResult, rootNode) => {
+  const { markup, strings, values } = templateResult
+
+  console.log({ markup })
+
+  let i = 0
+
+  walk(rootNode, (node) => {
+    if (node.nodeType === Node.COMMENT_NODE) {
+      const isOpenBrace = node.textContent === "{"
+
+      if (isOpenBrace) {
+        const { nextSibling } = node
+        const value = values[i]
+        i += 1
+
+        if (nextSibling.nodeType === Node.TEXT_NODE) {
+          // it WAS text
+          if (isPrimitive(value)) {
+            // it STILL IS text
+            if (nextSibling.textContent !== value) {
+              nextSibling.textContent = value
+            }
+          }
+
+          return nextSibling
+        }
+      }
+
+      //   const stars = node.textContent.match(/(\*+)/)?.[1].split("")
+      //   if (!stars) return
+      //   stars.forEach(() => {
+      //     // ...
+      //     const value = values[i]
+      //     const before = strings
+      //       .slice(0, i + 1)
+      //       .join("")
+      //       .trim()
+      //     const after = strings
+      //       .slice(i + 1)
+      //       .join("")
+      //       .trim()
+      //     next(node, { before, after, value })
+      //     i += 1
+      //   })
+    }
+  })
+}
