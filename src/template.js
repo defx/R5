@@ -28,28 +28,25 @@ export function html(strings, ...values) {
 
     const isAttr = str.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
 
-    console.log({ string, isAttr, str })
-
     if (isAttr) {
       const startOpenTag = str.lastIndexOf("<")
-      const placeholder = str.slice(0, startOpenTag).match(/<!-- (\*+) -->$/)
+      const placeholder = str.slice(0, startOpenTag).match(/<!--(\*+)-->$/)
 
       if (placeholder) {
         const n = placeholder[1].length
         str =
           str
             .slice(0, startOpenTag)
-            .replace(/<!-- (\*+) -->$/, `<!-- ${stars(n + 1)} -->`) +
+            .replace(/<!--(\*+)-->$/, `<!--${stars(n + 1)}-->`) +
           str.slice(startOpenTag)
       } else {
-        str =
-          str.slice(0, startOpenTag) + `<!-- * -->` + str.slice(startOpenTag)
+        str = str.slice(0, startOpenTag) + `<!--*-->` + str.slice(startOpenTag)
       }
 
       return str + values[i]
     }
 
-    return str + "<!-- * -->" + values[i]
+    return str + "<!--*-->" + values[i]
   }, "")
 
   return markup
