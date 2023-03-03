@@ -29,8 +29,7 @@ export const update = (templateResult, rootNode) => {
 
       if (isOpenBrace) {
         const { nextSibling } = node
-        const value = values[i]
-        i += 1
+        const value = values[i++]
 
         if (isPrimitive(value)) {
           if (nextSibling.nodeType === Node.TEXT_NODE) {
@@ -41,7 +40,8 @@ export const update = (templateResult, rootNode) => {
 
           return nextSibling
         } else if (Array.isArray(value) && isTemplateResult(value[0])) {
-          console.log("repeated block!!")
+          // this is followed by a repeated block...
+          // @todo: grab all the nodes between this node and the next closing brace
         }
       }
 
