@@ -10,17 +10,25 @@ const isOpenBrace = (node) =>
 const isCloseBrace = (node) =>
   node.nodeType === Node.COMMENT_NODE && node.textContent === "}"
 
-const getBlockNodes = (sentinel) => {
-  let nodes = []
+const getBlocks = (sentinel) => {
+  let blocks = []
   walk(
     sentinel.nextSibling,
-    (n) => {
-      if (isCloseBrace(n)) return null
-      nodes.push(n)
+    (node) => {
+      if (node.nodeType === Node.COMMENT_NODE) {
+        if (isCloseBrace(node)) return null
+        const id = node.textContent.match(/^#(.+)$/)?.[1]
+        if (id) {
+          blocks.push({ id, nodes: [] })
+          return
+        }
+      }
+
+      last(blocks)?.nodes.push(node)
     },
     false
   )
-  return nodes
+  return blocks
 }
 
 export const update = (templateResult, rootNode) => {
@@ -46,9 +54,10 @@ export const update = (templateResult, rootNode) => {
       } else if (Array.isArray(value) && isTemplateResult(value[0])) {
         // this is followed by a repeated block...
         // @todo: grab all the nodes between this node and the next closing brace
-        let blockNodes = getBlockNodes(node)
+        let blocks = getBlocks(node)
+        let prevIds = blocks.map(({ id }) => id)
 
-        console.log({ blockNodes })
+        console.log({ blocks })
       }
 
       //   const stars = node.textContent.match(/(\*+)/)?.[1].split("")

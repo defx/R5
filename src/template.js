@@ -20,7 +20,7 @@ function stars(n) {
 
 function value(v) {
   if (v) {
-    if (v.hasOwnProperty("markup")) return `<!--${v.$key || "*"}-->${v.markup}`
+    if (v.hasOwnProperty("markup")) return `<!--#${v.$key || "*"}-->${v.markup}`
     if (Array.isArray(v)) {
       // probs need to wrap this with two comments
       return `<!--{-->${v.map(value).join("")}<!--}-->`
