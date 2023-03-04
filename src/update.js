@@ -33,11 +33,11 @@ const getBlocks = (sentinel) => {
 
 function Block(v) {
   const { childNodes: nodes } = templateNodeFromString(
-    `<!--#${v.$key || "*"}-->${v.markup}`
+    `<!--#${v.id}-->${v.markup}`
   ).content.cloneNode(true)
 
   return {
-    id: v.$key,
+    id: v.id,
     nodes: [...nodes],
   }
 }
@@ -45,7 +45,7 @@ function Block(v) {
 export const update = (templateResult, rootNode) => {
   const { markup, strings, values } = templateResult
 
-  console.log({ markup })
+  // console.log({ markup })
 
   let i = 0
 
@@ -61,22 +61,18 @@ export const update = (templateResult, rootNode) => {
           }
         }
 
-        return nextSibling
+        return
       } else if (Array.isArray(value) && isTemplateResult(value[0])) {
         const blocks = getBlocks(node)
-        const nextIds = value.map(({ $key }) => $key)
-        const nextBlocks = nextIds.map((id, i) => {
-          if (id !== null) {
+        const nextBlocks = value.map(({ id }, i) => {
+          if (id !== undefined) {
             return blocks.find((block) => block.id == id) || Block(value[i])
           } else {
             return blocks[i]
           }
         })
-
         const lastNode = last(last(nextBlocks).nodes)
-
         let t = node
-
         nextBlocks.forEach((block, i) => {
           const firstChild = first(block.nodes)
           if (t.nextSibling !== firstChild) {
