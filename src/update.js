@@ -63,10 +63,7 @@ export const update = (templateResult, rootNode) => {
 
         return nextSibling
       } else if (Array.isArray(value) && isTemplateResult(value[0])) {
-        // this is followed by a repeated block...
-        // @todo: grab all the nodes between this node and the next closing brace
         const blocks = getBlocks(node)
-        const prevIds = blocks.map(({ id }) => id)
         const nextIds = value.map(({ $key }) => $key)
         const nextBlocks = nextIds.map((id, i) => {
           if (id !== null) {
