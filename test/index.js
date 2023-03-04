@@ -104,8 +104,6 @@ describe("render", () => {
       "KimMattTheaEricka"
     )
 
-    return
-
     const [kim] = li
 
     render(

@@ -20,7 +20,7 @@ const getBlocks = (sentinel) => {
         const id = node.textContent.match(/^#(.+)$/)?.[1]
         if (id) {
           blocks.push({ id, nodes: [] })
-          return
+          // return
         }
       }
 
@@ -75,6 +75,7 @@ export const update = (templateResult, rootNode) => {
             return blocks[i]
           }
         })
+
         const lastNode = last(last(nextBlocks).nodes)
 
         let t = node
