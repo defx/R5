@@ -98,13 +98,13 @@ describe("render", () => {
 
     const li = [...rootNode.querySelectorAll("li")]
 
-    return
-
     assert.equal(li.length, 4)
     assert.equal(
       rootNode.textContent.replace(/\s*\n\s*/g, ""),
       "KimMattTheaEricka"
     )
+
+    return
 
     const [kim] = li
 

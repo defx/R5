@@ -1,4 +1,4 @@
-import { last, walk } from "./helpers.js"
+import { first, last, walk, templateNodeFromString } from "./helpers.js"
 
 const isTemplateResult = (v) => v?.hasOwnProperty("markup")
 
@@ -31,6 +31,17 @@ const getBlocks = (sentinel) => {
   return blocks
 }
 
+function Block(v) {
+  const { childNodes: nodes } = templateNodeFromString(
+    `<!--#${v.$key || "*"}-->${v.markup}`
+  ).content.cloneNode(true)
+
+  return {
+    id: v.$key,
+    nodes: [...nodes],
+  }
+}
+
 export const update = (templateResult, rootNode) => {
   const { markup, strings, values } = templateResult
 
@@ -54,10 +65,30 @@ export const update = (templateResult, rootNode) => {
       } else if (Array.isArray(value) && isTemplateResult(value[0])) {
         // this is followed by a repeated block...
         // @todo: grab all the nodes between this node and the next closing brace
-        let blocks = getBlocks(node)
-        let prevIds = blocks.map(({ id }) => id)
+        const blocks = getBlocks(node)
+        const prevIds = blocks.map(({ id }) => id)
+        const nextIds = value.map(({ $key }) => $key)
+        const nextBlocks = nextIds.map((id, i) => {
+          if (id !== null) {
+            return blocks.find((block) => block.id == id) || Block(value[i])
+          } else {
+            return blocks[i]
+          }
+        })
+        const lastNode = last(last(nextBlocks).nodes)
 
-        console.log({ blocks })
+        let t = node
+
+        nextBlocks.forEach((block, i) => {
+          const firstChild = first(block.nodes)
+          if (t.nextSibling !== firstChild) {
+            t.after(...block.nodes)
+          }
+          update(value[i], firstChild)
+          t = last(block.nodes)
+        })
+
+        return lastNode.nextSibling
       }
 
       //   const stars = node.textContent.match(/(\*+)/)?.[1].split("")

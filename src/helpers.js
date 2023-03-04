@@ -1,4 +1,6 @@
-export const last = (v = []) => v[v.length - 1]
+export const first = (v) => v[0]
+
+export const last = (v) => v[v.length - 1]
 
 export const walk = (node, callback, deep = true) => {
   if (!node) return
