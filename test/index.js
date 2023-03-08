@@ -38,10 +38,35 @@ describe("render", () => {
     assert.equal(rootNode.children[0].textContent, "foo ok bar")
   })
 
-  // it("sets attributes", () => {
-  //   render(html`<p class="${"foo"} ${"bar"}"></p>`, rootNode)
-  //   assert.equal(rootNode.children[0].getAttribute("class"), "foo bar")
-  // })
+  it("sets attributes", () => {
+    render(html`<p class="${"foo"} ${"bar"}"></p>`, rootNode)
+    assert.equal(rootNode.children[0].getAttribute("class"), "foo bar")
+  })
+
+  it("updates attributes", () => {
+    render(
+      html`<p
+        id="a1"
+        class="${"foo"} bar ${"baz"}"
+        style="backgroundColor: gold;"
+      >
+        <em class="${"boo"}"></em>
+      </p>`,
+      rootNode
+    )
+    assert.equal(rootNode.children[0].getAttribute("class"), "foo bar baz")
+    render(
+      html`<p
+        id="a1"
+        class="${"bar"} baz ${"foo"}"
+        style="backgroundColor: gold;"
+      >
+        <em class="${"boo"}"></em><
+      </p>`,
+      rootNode
+    )
+    assert.equal(rootNode.children[0].getAttribute("class"), "bar baz foo")
+  })
 
   // it("toggles boolean attributes", () => {
   //   render(html`<p hidden="${false}"></p>`, rootNode)

@@ -31,6 +31,8 @@ function value(v) {
 
 export function html(strings, ...values) {
   const L = values.length - 1
+  const attributes = {}
+  let p = -1
 
   const markup = strings.reduce((markup, string, i) => {
     let str = markup + string
@@ -52,7 +54,11 @@ export function html(strings, ...values) {
           str.slice(startOpenTag)
       } else {
         str = str.slice(0, startOpenTag) + `<!--*-->` + str.slice(startOpenTag)
+        p++
       }
+
+      attributes[p] = attributes[p] || new Set()
+      attributes[p].add(isAttr[1])
 
       return str + values[i]
     }
@@ -64,6 +70,7 @@ export function html(strings, ...values) {
     markup,
     strings,
     values,
+    attributes,
     key(v) {
       this.id = v
       return this

@@ -4,6 +4,9 @@ const isTemplateResult = (v) => v?.hasOwnProperty("markup")
 
 const isPrimitive = (v) => v === null || typeof v !== "object"
 
+const isAttributeSentinel = (node) =>
+  node.nodeType === Node.COMMENT_NODE && node.textContent.match(/\*+/)
+
 const isOpenBrace = (node) =>
   node.nodeType === Node.COMMENT_NODE && node.textContent === "{"
 
@@ -42,17 +45,26 @@ function Block(v) {
   }
 }
 
+function attributeValue(name, p, markup) {
+  return markup
+    .split(/<!--\*+-->/g)
+    .filter((v) => v)
+    [p]?.match(new RegExp(`${name}=["']([^'"]*)`))?.[1]
+}
+
 export const update = (templateResult, rootNode) => {
-  const { markup, strings, values } = templateResult
+  const { markup, strings, values, attributes } = templateResult
 
-  // console.log({ markup })
+  // console.log({ markup: markup.replace(/\s+/g, " "), strings })
 
-  let i = 0
+  let v = 0 // value count
+  let p = 0 // placeholder count
 
   walk(rootNode, (node) => {
     if (isOpenBrace(node)) {
       const { nextSibling } = node
-      const value = values[i++]
+
+      const value = values[v++]
 
       if (isPrimitive(value)) {
         if (nextSibling.nodeType === Node.TEXT_NODE) {
@@ -84,23 +96,21 @@ export const update = (templateResult, rootNode) => {
 
         return lastNode.nextSibling
       }
+      p++
+    } else if (isAttributeSentinel(node)) {
+      const stars = node.textContent.match(/(\*+)/)?.[1].split("")
+      const target = node.nextSibling
 
-      //   const stars = node.textContent.match(/(\*+)/)?.[1].split("")
-      //   if (!stars) return
-      //   stars.forEach(() => {
-      //     // ...
-      //     const value = values[i]
-      //     const before = strings
-      //       .slice(0, i + 1)
-      //       .join("")
-      //       .trim()
-      //     const after = strings
-      //       .slice(i + 1)
-      //       .join("")
-      //       .trim()
-      //     next(node, { before, after, value })
-      //     i += 1
-      //   })
+      Array.from(attributes[p]).forEach((name) => {
+        const value = attributeValue(name, p, markup)
+
+        if (target.getAttribute(name) !== value) {
+          target.setAttribute(name, value)
+        }
+      })
+
+      v += stars.length
+      p++
     }
   })
 }
