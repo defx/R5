@@ -154,13 +154,11 @@ describe("literally", () => {
 
   it("binds events", () => {
     let x
-
     render(html`<a onclick="${() => (x = "foo")}"></a>`, rootNode)
     rootNode.children[0].click()
     assert.equal(x, "foo")
     render(html`<a onclick="${() => (x = "bar")}"></a>`, rootNode)
     rootNode.children[0].click()
     assert.equal(x, "bar")
-    /* @todo: spy on addEventListener to prove that it is only called once */
   })
 })
