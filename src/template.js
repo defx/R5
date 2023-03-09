@@ -42,6 +42,10 @@ export function html(strings, ...values) {
       }
 
       if (isAttributeValue) {
+        if (isAttributeValue[1].startsWith("on")) {
+          console.log("handle event binding!", str)
+        }
+
         return str + values[i]
       } else {
         const v = values[i]
