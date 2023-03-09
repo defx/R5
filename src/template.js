@@ -32,7 +32,6 @@ function value(v) {
 
 export function html(strings, ...values) {
   const L = values.length - 1
-  const attributes = {}
   let p = -1
 
   const markup = strings.reduce((markup, string, i) => {
@@ -60,11 +59,8 @@ export function html(strings, ...values) {
       }
 
       if (isAttributeValue) {
-        attributes[p] = attributes[p] || new Set()
-        attributes[p].add(isAttributeValue[1])
         return str + values[i]
       } else {
-        console.log("boolean attribute key", strings.slice(0))
         const v = values[i]
         if (values[i]) {
           return str + `${v}`
@@ -81,7 +77,6 @@ export function html(strings, ...values) {
     markup,
     strings,
     values,
-    attributes,
     key(v) {
       this.id = v
       return this

@@ -78,8 +78,8 @@ describe("render", () => {
   it("set conditional/boolean attributes", () => {
     render(html`<p ${"hidden"}></p>`, rootNode)
     assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
-    render(html`<p ${"hidden"}></p>`, rootNode)
-    assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
+    render(html`<p ${false}></p>`, rootNode)
+    assert.equal(rootNode.children[0].hasAttribute("hidden"), false)
   })
 
   // it("sets truthy/falsy aria-* attributes", () => {

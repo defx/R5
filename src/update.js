@@ -45,27 +45,11 @@ function Block(v) {
   }
 }
 
-function attributeValue(name, p, markup) {
-  return markup
-    .split(/<!--\*+-->/g)
-    .filter((v) => v)
-    [p]?.match(new RegExp(`${name}=["']([^'"]*)`))?.[1]
-}
-
 function getAttributes(p, markup) {
   return markup
     .split(/<!--\*+-->/g)
     .filter((v) => v)
     [p]?.match(/([^\s]+)=(?:["'])([^"']*)(?:["'])/g)
-}
-
-function attributeDictionary(attributes) {
-  return attributes
-    .map((v) => v.split("="))
-    .reduce((o, [k, v]) => {
-      o[k] = v.slice(1, -1)
-      return o
-    }, {})
 }
 
 function attributeEntries(attributes) {
@@ -78,10 +62,7 @@ function attributeEntries(attributes) {
 }
 
 export const update = (templateResult, rootNode) => {
-  const { markup, strings, values, attributes } = templateResult
-
-  // console.log({ markup: markup.replace(/\s+/g, " "), strings })
-
+  const { markup, strings, values } = templateResult
   let v = 0 // value count
   let p = 0 // placeholder count
 
@@ -125,26 +106,23 @@ export const update = (templateResult, rootNode) => {
     } else if (isAttributeSentinel(node)) {
       const stars = node.textContent.match(/(\*+)/)?.[1].split("")
       const target = node.nextSibling
+      const newAttributes = attributeEntries(getAttributes(p, markup))
 
-      const attrs = Array.from(attributes[p] || [])
-
-      attrs.forEach((name) => {
-        const value = attributeValue(name, p, markup)
-
-        if (target.getAttribute(name) !== value) {
-          target.setAttribute(name, value)
-        }
-      })
-
-      attributeEntries(getAttributes(p, markup)).forEach(([name, value]) => {
-        console.log("?", { name, value })
-
+      newAttributes.forEach(([name, value]) => {
         if (target.hasAttribute(name)) {
-          // ...
+          if (target.getAttribute(name) !== value) {
+            target.setAttribute(name, value)
+          }
         } else {
           target.setAttribute(name, value)
         }
       })
+
+      for (const attr of target.attributes) {
+        if (!newAttributes.find(([name]) => name === attr.name)) {
+          target.removeAttribute(attr.name)
+        }
+      }
 
       v += stars.length
       p++
