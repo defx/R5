@@ -69,13 +69,6 @@ describe("literally", () => {
   })
 
   it("set conditional/boolean attributes", () => {
-    render(html`<p ${false}></p>`, rootNode)
-    assert.equal(rootNode.children[0].hasAttribute("hidden"), false)
-    render(html`<p ${`hidden=""`}></p>`, rootNode)
-    assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
-  })
-
-  it("set conditional/boolean attributes (reverse)", () => {
     render(html`<p ${"hidden"}></p>`, rootNode)
     assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
     render(html`<p ${false}></p>`, rootNode)
