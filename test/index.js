@@ -82,12 +82,12 @@ describe("render", () => {
     assert.equal(rootNode.children[0].hasAttribute("hidden"), false)
   })
 
-  // it("sets truthy/falsy aria-* attributes", () => {
-  //   render(html`<p aria-hidden="${false}"></p>`, rootNode)
-  //   assert.equal(rootNode.children[0].getAttribute("aria-hidden"), "false")
-  //   render(html`<p aria-hidden="${true}"></p>`, rootNode)
-  //   assert.equal(rootNode.children[0].getAttribute("aria-hidden"), "true")
-  // })
+  it("sets truthy/falsy aria-* attributes", () => {
+    render(html`<p aria-hidden="${false}"></p>`, rootNode)
+    assert.equal(rootNode.children[0].getAttribute("aria-hidden"), "false")
+    render(html`<p aria-hidden="${true}"></p>`, rootNode)
+    assert.equal(rootNode.children[0].getAttribute("aria-hidden"), "true")
+  })
 
   it("renders lists", () => {
     render(
