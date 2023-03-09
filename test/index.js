@@ -9,7 +9,7 @@ describe("render", () => {
   })
 
   afterEach(() => {
-    // document.body.removeChild(rootNode)
+    document.body.removeChild(rootNode)
   })
 
   it("renders static content", () => {
