@@ -1,6 +1,6 @@
 import { html, render } from "../src/index.js"
 
-describe("render", () => {
+describe("literally", () => {
   let rootNode
 
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe("render", () => {
     assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
   })
 
-  it("set conditional/boolean attributes", () => {
+  it("set conditional/boolean attributes (reverse)", () => {
     render(html`<p ${"hidden"}></p>`, rootNode)
     assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
     render(html`<p ${false}></p>`, rootNode)
