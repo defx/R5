@@ -52,6 +52,31 @@ function attributeValue(name, p, markup) {
     [p]?.match(new RegExp(`${name}=["']([^'"]*)`))?.[1]
 }
 
+function getAttributes(p, markup) {
+  return markup
+    .split(/<!--\*+-->/g)
+    .filter((v) => v)
+    [p]?.match(/([^\s]+)=(?:["'])([^"']*)(?:["'])/g)
+}
+
+function attributeDictionary(attributes) {
+  return attributes
+    .map((v) => v.split("="))
+    .reduce((o, [k, v]) => {
+      o[k] = v.slice(1, -1)
+      return o
+    }, {})
+}
+
+function attributeEntries(attributes) {
+  return (
+    attributes?.map((v) => {
+      const [a, b] = v.split("=")
+      return [a, b.slice(1, -1)]
+    }) || []
+  )
+}
+
 export const update = (templateResult, rootNode) => {
   const { markup, strings, values, attributes } = templateResult
 
@@ -101,12 +126,22 @@ export const update = (templateResult, rootNode) => {
       const stars = node.textContent.match(/(\*+)/)?.[1].split("")
       const target = node.nextSibling
 
-      console.log({ attributes })
+      const attrs = Array.from(attributes[p] || [])
 
-      Array.from(attributes[p]).forEach((name) => {
+      attrs.forEach((name) => {
         const value = attributeValue(name, p, markup)
 
         if (target.getAttribute(name) !== value) {
+          target.setAttribute(name, value)
+        }
+      })
+
+      attributeEntries(getAttributes(p, markup)).forEach(([name, value]) => {
+        console.log("?", { name, value })
+
+        if (target.hasAttribute(name)) {
+          // ...
+        } else {
           target.setAttribute(name, value)
         }
       })

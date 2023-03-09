@@ -27,8 +27,6 @@ function value(v) {
     }
   }
 
-  console.log("no v!")
-
   return `<!--{-->${v}<!--}-->`
 }
 
