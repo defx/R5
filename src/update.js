@@ -108,6 +108,8 @@ export const update = (templateResult, rootNode) => {
       const target = node.nextSibling
       const newAttributes = attributeEntries(getAttributes(p, markup))
 
+      console.log({ newAttributes })
+
       newAttributes.forEach(([name, value]) => {
         if (target.hasAttribute(name)) {
           if (target.getAttribute(name) !== value) {

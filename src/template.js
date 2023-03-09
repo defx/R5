@@ -43,7 +43,10 @@ export function html(strings, ...values) {
 
       if (isAttributeValue) {
         if (isAttributeValue[1].startsWith("on")) {
-          console.log("handle event binding!", str)
+          // console.log("handle event binding!", str, i)
+          // str = str.replace(/\s(on[\w]+=['""'])$/, " data-$1")
+          str = str.replace(/\s(on([\w]+)=['""'])$/, ` data-on="$2:`)
+          return str + i
         }
 
         return str + values[i]
