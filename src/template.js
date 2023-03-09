@@ -1,19 +1,3 @@
-import { parse } from "./parse.js"
-
-const cache = new Map()
-
-/*
-
-<p class="${"foo"} to ${"bar"}">to ${"baz"}</p>
-
-->
-
-<!-- ** -->
-<p class="foo to bar">to <!-- * -->baz</p>
-
-
-*/
-
 function stars(n) {
   return new Array(n).fill("*").join("")
 }
@@ -22,7 +6,6 @@ function value(v) {
   if (v) {
     if (v.hasOwnProperty("markup")) return `<!--#${v.id}-->${v.markup}`
     if (Array.isArray(v)) {
-      // probs need to wrap this with two comments
       return `<!--{-->${v.map(value).join("")}<!--}-->`
     }
   }
@@ -79,26 +62,6 @@ export function html(strings, ...values) {
     values,
     key(v) {
       this.id = v
-      return this
-    },
-  }
-}
-
-// html`<div>${"0"}</div><p class="${"foo"} bar ${"baz"}">${"1"}</p>`
-
-export function xhtml(strings, ...values) {
-  const key = strings.join("%")
-
-  if (!cache.has(key)) {
-    cache.set(key, parse(strings))
-  }
-
-  return {
-    $key: null,
-    ...cache.get(key),
-    v: values,
-    key(k) {
-      this.$key = k
       return this
     },
   }
