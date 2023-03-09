@@ -9,7 +9,7 @@ describe("literally", () => {
   })
 
   afterEach(() => {
-    // document.body.removeChild(rootNode)
+    document.body.removeChild(rootNode)
   })
 
   it("renders static content", () => {
@@ -163,11 +163,11 @@ describe("literally", () => {
     let x
 
     render(html`<a onclick="${() => (x = "foo")}"></a>`, rootNode)
-    // rootNode.children[0].click()
-    // assert.equal(x, "foo")
-    // render(html`<a onclick="${() => (x = "bar")}"></a>`, rootNode)
-    // rootNode.children[0].click()
-    // assert.equal(x, "bar")
+    rootNode.children[0].click()
+    assert.equal(x, "foo")
+    render(html`<a onclick="${() => (x = "bar")}"></a>`, rootNode)
+    rootNode.children[0].click()
+    assert.equal(x, "bar")
     /* @todo: spy on addEventListener to prove that it is only called once */
   })
 })

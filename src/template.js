@@ -16,6 +16,7 @@ function value(v) {
 export function html(strings, ...values) {
   const L = values.length - 1
   let p = -1
+  const events = new Set()
 
   const markup = strings.reduce((markup, string, i) => {
     let str = markup + string
@@ -43,9 +44,9 @@ export function html(strings, ...values) {
 
       if (isAttributeValue) {
         if (isAttributeValue[1].startsWith("on")) {
-          // console.log("handle event binding!", str, i)
-          // str = str.replace(/\s(on[\w]+=['""'])$/, " data-$1")
-          str = str.replace(/\s(on([\w]+)=['""'])$/, ` data-on="$2:`)
+          const type = isAttributeValue[1].slice(2)
+          events.add(type)
+          str = str.replace(/\s(on[\w]+=['""'])$/, " data-$1")
           return str + i
         }
 
@@ -67,6 +68,7 @@ export function html(strings, ...values) {
     markup,
     strings,
     values,
+    events,
     key(v) {
       this.id = v
       return this
