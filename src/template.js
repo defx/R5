@@ -26,6 +26,9 @@ function value(v) {
       return `<!--{-->${v.map(value).join("")}<!--}-->`
     }
   }
+
+  console.log("no v!")
+
   return `<!--{-->${v}<!--}-->`
 }
 
@@ -39,9 +42,10 @@ export function html(strings, ...values) {
 
     if (i > L) return str
 
-    const isAttr = str.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
+    const isElement = str.match(/<[^\/>]+$/)
+    const isAttributeValue = str.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
 
-    if (isAttr) {
+    if (isElement) {
       const startOpenTag = str.lastIndexOf("<")
       const placeholder = str.slice(0, startOpenTag).match(/<!--(\*+)-->$/)
 
@@ -57,10 +61,19 @@ export function html(strings, ...values) {
         p++
       }
 
-      attributes[p] = attributes[p] || new Set()
-      attributes[p].add(isAttr[1])
-
-      return str + values[i]
+      if (isAttributeValue) {
+        attributes[p] = attributes[p] || new Set()
+        attributes[p].add(isAttributeValue[1])
+        return str + values[i]
+      } else {
+        console.log("boolean attribute key", strings.slice(0))
+        const v = values[i]
+        if (values[i]) {
+          return str + `${v}`
+        } else {
+          return str
+        }
+      }
     }
 
     return str + value(values[i])

@@ -68,12 +68,19 @@ describe("render", () => {
     assert.equal(rootNode.children[0].getAttribute("class"), "bar baz foo")
   })
 
-  // it("toggles boolean attributes", () => {
-  //   render(html`<p hidden="${false}"></p>`, rootNode)
-  //   assert.equal(rootNode.children[0].hasAttribute("hidden"), false)
-  //   render(html`<p hidden="${true}"></p>`, rootNode)
-  //   assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
-  // })
+  it("set conditional/boolean attributes", () => {
+    render(html`<p ${false}></p>`, rootNode)
+    assert.equal(rootNode.children[0].hasAttribute("hidden"), false)
+    render(html`<p ${`hidden=""`}></p>`, rootNode)
+    assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
+  })
+
+  it.skip("set conditional/boolean attributes", () => {
+    render(html`<p ${"hidden"}></p>`, rootNode)
+    assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
+    // render(html`<p ${"hidden"}></p>`, rootNode)
+    // assert.equal(rootNode.children[0].hasAttribute("hidden"), true)
+  })
 
   // it("sets truthy/falsy aria-* attributes", () => {
   //   render(html`<p aria-hidden="${false}"></p>`, rootNode)

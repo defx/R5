@@ -18,3 +18,9 @@ export function templateNodeFromString(str) {
   node.innerHTML = str.trim()
   return node
 }
+
+export const Attribute = {
+  Boolean(name, value) {
+    return value ? `${name}=""` : ""
+  },
+}

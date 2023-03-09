@@ -101,6 +101,8 @@ export const update = (templateResult, rootNode) => {
       const stars = node.textContent.match(/(\*+)/)?.[1].split("")
       const target = node.nextSibling
 
+      console.log({ attributes })
+
       Array.from(attributes[p]).forEach((name) => {
         const value = attributeValue(name, p, markup)
 
