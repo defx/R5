@@ -3,8 +3,9 @@ import { update } from "./update.js"
 
 const nodes = new WeakSet()
 const eventListeners = new WeakMap()
+const isServer = typeof window === "undefined"
 
-function bindEvents(rootNode, events, values) {
+function bindEvents(rootNode, events = [], values = []) {
   if (typeof window === "undefined") return
   rootNode.$values = values
   const types = [...events]
@@ -22,12 +23,18 @@ function bindEvents(rootNode, events, values) {
 }
 
 export function render(templateResult, rootNode) {
+  const { markup } = templateResult
+  if (isServer) return markup
   if (!nodes.has(rootNode)) {
-    const { markup } = templateResult
     rootNode.innerHTML = markup
     nodes.add(rootNode)
   } else {
     update(templateResult, rootNode.firstChild)
   }
+  bindEvents(rootNode, templateResult.events, templateResult.values)
+}
+
+export function hydrate(templateResult, rootNode) {
+  nodes.add(rootNode)
   bindEvents(rootNode, templateResult.events, templateResult.values)
 }
