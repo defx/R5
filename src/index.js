@@ -25,16 +25,14 @@ function bindEvents(rootNode, events = [], values = []) {
 export function render(templateResult, rootNode) {
   const { markup } = templateResult
   if (isServer || !rootNode) return markup
+
   if (!nodes.has(rootNode)) {
-    rootNode.innerHTML = markup
+    if (rootNode.innerHTML !== markup) {
+      rootNode.innerHTML = markup
+    }
     nodes.add(rootNode)
   } else {
     update(templateResult, rootNode.firstChild)
   }
-  bindEvents(rootNode, templateResult.events, templateResult.values)
-}
-
-export function hydrate(templateResult, rootNode) {
-  nodes.add(rootNode)
   bindEvents(rootNode, templateResult.events, templateResult.values)
 }
