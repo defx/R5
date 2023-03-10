@@ -12,6 +12,10 @@ describe("literally", () => {
     document.body.removeChild(rootNode)
   })
 
+  it("returns the markup", () => {
+    assert.equal(html`<p>Hello World!</p>`, `<p>Hello World!</p>`)
+  })
+
   it("renders static content", () => {
     render(
       html`<!-- hello world! -->

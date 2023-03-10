@@ -3,7 +3,6 @@ import { update } from "./update.js"
 
 const nodes = new WeakSet()
 const eventListeners = new WeakMap()
-const isServer = typeof window === "undefined"
 
 function bindEvents(rootNode, events = [], values = []) {
   if (typeof window === "undefined") return
@@ -24,7 +23,7 @@ function bindEvents(rootNode, events = [], values = []) {
 
 export function render(templateResult, rootNode) {
   const { markup } = templateResult
-  if (isServer) return markup
+
   if (!nodes.has(rootNode)) {
     rootNode.innerHTML = markup
     nodes.add(rootNode)

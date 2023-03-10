@@ -64,7 +64,7 @@ export function html(strings, ...values) {
     return str + value(values[i])
   }, "")
 
-  return {
+  return Object.assign(markup, {
     markup,
     strings,
     values,
@@ -73,5 +73,5 @@ export function html(strings, ...values) {
       this.id = v
       return this
     },
-  }
+  })
 }

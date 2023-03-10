@@ -62,7 +62,7 @@ function attributeEntries(attributes) {
 }
 
 export const update = (templateResult, rootNode) => {
-  const { markup, strings, values } = templateResult
+  const { markup, values } = templateResult
   let v = 0 // value count
   let p = 0 // placeholder count
 

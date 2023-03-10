@@ -4,7 +4,7 @@ export default [
   {
     input: "src/index.js",
     output: {
-      file: "dist/synergy.js",
+      file: "dist/r5.js",
       format: "es",
     },
   },
@@ -12,7 +12,7 @@ export default [
     input: "src/index.js",
     plugins: [terser()],
     output: {
-      file: "dist/synergy.min.js",
+      file: "dist/r5.min.js",
       format: "es",
     },
   },
