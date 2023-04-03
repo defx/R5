@@ -16,13 +16,13 @@ R5 templates are written in standard JavaScript with Template Literals.
 ```js
 import { html, render } from "@defx/r5"
 
-// The html function is used to render a template
+// create a template with the html tag function
 const helloWorld = (name) => html`<p>Hello ${name} 👋</p>`
 
-// The render function is used to render a template to the DOM
+// render a template to the DOM
 render(helloWorld("Kimberley"), document.body)
 
-// Calling the render function again updates the text of our existing div node
+// effeciently update the existing DOM
 render(helloWorld("Thea"), document.body)
 ```
 
