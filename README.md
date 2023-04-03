@@ -1,3 +1,7 @@
+<svg>
+
+<switch>
+<foreignObject>
 <div align="center" style="margin:36px 0; border-bottom: 2px solid #333">
 <h1 style="font-size:128px; font-family: monospace; margin: 0; border: 0; padding: 0;">R5</h1>
 
@@ -7,9 +11,12 @@
 <li style="margin: 0 0.5rem; padding: 0 0.5rem">isomorphic</li>
 </ul>
 
-<!-- <h2 style="font-family: monospace; font-style: normal">"The Little Renderer"</h2> -->
-
 <p style="font-family: sans-serif; margin: 32px 0; font-style: italic; font-size: 16px; letter-spacing: 0.06em">"The little HTML renderer"</p>
+</foreignObject>
+
+</switch>
+
+</svg>
 
 @defx/r5 is a ~1.5Kb JavaScript library consisting of two essential utility functions that can be used to efficiently render your HTML. R5's minimalist design is small and flexible enough to fit into any UI architecture, no matter how simple or complex,<br/> it's the "little renderer" you can rely on.
 
@@ -18,7 +25,7 @@
 ### Installation via NPM
 
 ```sh
-npm install
+npm install @defx/r5
 ```
 
 ### Usage via CDN
