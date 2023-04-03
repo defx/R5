@@ -26,10 +26,15 @@ render(helloWorld("Kimberley"), document.body)
 render(helloWorld("Thea"), document.body)
 ```
 
-R5 provides two main exports:
+## API
 
-    `html`: A tag function that accepts an HTML Template Literal and returns a template value
-    `render()`: A function that renders a template value to a DOM node.
+### html
+
+The HTML function is a Tag Function that accepts an HTML Template Literal. It returns an R5 template object, which is essentially a description of what needs to be rendered.
+
+### render
+
+The render function takes an R5 template object and renders it to the provided DOM node. Subsequent invocations of the render function cause the existing DOM to be efficiently updated in only the places where values have changed. When invoked on the server side, this function will always return a String of HTML, so it may be used in the same way for both server and client-side rendering. If you render HTML on the server and the re-render on the browser, then the existing HTML will be hydrated with any event bindings.
 
 </div>
 <br />
