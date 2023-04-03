@@ -1,6 +1,5 @@
 <svg>
 
-<switch>
 <foreignObject>
 <div align="center" style="margin:36px 0; border-bottom: 2px solid #333">
 <h1 style="font-size:128px; font-family: monospace; margin: 0; border: 0; padding: 0;">R5</h1>
@@ -13,8 +12,6 @@
 
 <p style="font-family: sans-serif; margin: 32px 0; font-style: italic; font-size: 16px; letter-spacing: 0.06em">"The little HTML renderer"</p>
 </foreignObject>
-
-</switch>
 
 </svg>
 
