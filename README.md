@@ -46,4 +46,12 @@ The HTML function is a Tag Function that accepts an HTML Template Literal. It re
 
 ### render
 
-The render function takes an R5 template object and renders it to the provided DOM node. Subsequent invocations of the render function cause the existing DOM to be efficiently updated in only the places where values have changed. When invoked on the server side, this function will always return a String of HTML, so it may be used in the same way for both server and client-side rendering. If you render HTML on the server and the re-render on the browser, then the existing HTML will be hydrated with any event bindings.
+The render function takes an R5 template object and renders it to the provided DOM node. Subsequent invocations of the render function cause the existing DOM to be efficiently updated in only the places where values have changed.
+
+#### isomorphism
+
+When invoked on the server side, this function will always return a String of HTML, so it may be used in the same way for both server and client-side rendering.
+
+#### hydration
+
+You may also re-render server-rendered html in the browser to "hydrate" the event bindings (R5 will ignore the DOM update step if it sees that the existing HTML matches the generated template object)
