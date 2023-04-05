@@ -47,16 +47,17 @@ function Block(v) {
 
 function getAttributes(p, markup) {
   return markup
-    .split(/<!--\*+-->/g)
+    .match(/<!--\*+-->(<[^>]+>)/g)
     .filter((v) => v)
-    [p]?.match(/([^\s]+)=(?:["'])([^"']*)(?:["'])/g)
+    [p].split("-->")[1]
+    .match(/[^\t\n\f /><"'=]+=['"][^'"]+['"]|(?<!<)[^\t\n\f /><"'=]+/g)
 }
 
 function attributeEntries(attributes) {
   return (
     attributes?.map((v) => {
       const [a, b] = v.split("=")
-      return [a, b.slice(1, -1)]
+      return [a, b ? b.slice(1, -1) : ""]
     }) || []
   )
 }
