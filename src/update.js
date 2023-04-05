@@ -110,6 +110,11 @@ export const update = (templateResult, rootNode) => {
       const newAttributes = attributeEntries(getAttributes(p, markup))
 
       newAttributes.forEach(([name, value]) => {
+        if (name === "value") {
+          target.value = value
+          return
+        }
+
         if (target.hasAttribute(name)) {
           if (target.getAttribute(name) !== value) {
             target.setAttribute(name, value)
