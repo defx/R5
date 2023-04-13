@@ -61,7 +61,7 @@ export function html(strings, ...values) {
       }
     }
 
-    if (str.match(/<textarea [^>]+>$/)) {
+    if (str.match(/<textarea[\s\n\r][^>]+>$/m)) {
       return str + values[i]
     }
 
