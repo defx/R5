@@ -61,6 +61,10 @@ export function html(strings, ...values) {
       }
     }
 
+    if (string.startsWith("<textarea")) {
+      return markup + "<!--{-->" + string + values[i]
+    }
+
     return str + value(values[i])
   }, "")
 

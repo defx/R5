@@ -1,6 +1,6 @@
 import { html, render } from "../src/index.js"
 
-describe("literally", () => {
+describe("r5", () => {
   let rootNode
 
   beforeEach(() => {
@@ -164,5 +164,18 @@ describe("literally", () => {
     render(html`<a onclick="${() => (x = "bar")}"></a>`, rootNode)
     rootNode.children[0].click()
     assert.equal(x, "bar")
+  })
+
+  it("sets textarea", () => {
+    render(
+      html`<textarea maxlength="2" autofocus>${"bonjour"}</textarea>`,
+      rootNode
+    )
+    assert.equal(rootNode.children[0].textContent, "bonjour")
+    render(
+      html`<textarea maxlength="2" autofocus>${"hello"}</textarea>`,
+      rootNode
+    )
+    assert.equal(rootNode.children[0].textContent, "hello")
   })
 })

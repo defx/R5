@@ -74,10 +74,8 @@ export const update = (templateResult, rootNode) => {
       const value = values[v++]
 
       if (isPrimitive(value)) {
-        if (nextSibling.nodeType === Node.TEXT_NODE) {
-          if (nextSibling.textContent !== value) {
-            nextSibling.textContent = value
-          }
+        if (nextSibling.textContent !== value) {
+          nextSibling.textContent = value
         }
 
         return
