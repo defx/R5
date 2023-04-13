@@ -9,7 +9,7 @@ describe("r5", () => {
   })
 
   afterEach(() => {
-    document.body.removeChild(rootNode)
+    // document.body.removeChild(rootNode)
   })
 
   it("returns the markup", () => {
@@ -168,12 +168,12 @@ describe("r5", () => {
 
   it("sets textarea", () => {
     render(
-      html`<textarea maxlength="2" autofocus>${"bonjour"}</textarea>`,
+      html`hi<textarea maxlength="${2}" autofocus>${"bonjour"}</textarea>`,
       rootNode
     )
     assert.equal(rootNode.children[0].textContent, "bonjour")
     render(
-      html`<textarea maxlength="2" autofocus>${"hello"}</textarea>`,
+      html`<textarea maxlength="${2}" autofocus>${"hello"}</textarea>`,
       rootNode
     )
     assert.equal(rootNode.children[0].textContent, "hello")

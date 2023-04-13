@@ -7,6 +7,9 @@ const isPrimitive = (v) => v === null || typeof v !== "object"
 const isAttributeSentinel = (node) =>
   node.nodeType === Node.COMMENT_NODE && node.textContent.match(/\*+/)
 
+const isTextAreaSentinel = (node) =>
+  node.nodeType === Node.COMMENT_NODE && node.textContent.match("&")
+
 const isOpenBrace = (node) =>
   node.nodeType === Node.COMMENT_NODE && node.textContent === "{"
 
@@ -45,11 +48,10 @@ function Block(v) {
   }
 }
 
-function getAttributes(p, markup) {
+function getAttributes(markup) {
   return markup
-    .match(/<!--\*+-->(<[^>]+>)/g)
-    .filter((v) => v)
-    [p].split("-->")[1]
+    .match(/<!--\*+-->(<[^>]+>)/g)[0]
+    .split(/--><[\w-]+\s/)[1]
     .match(/[^\t\n\f /><"'=]+=['"][^'"]+['"]|(?<!<)[^\t\n\f /><"'=]+/g)
 }
 
@@ -65,7 +67,6 @@ function attributeEntries(attributes) {
 export const update = (templateResult, rootNode) => {
   const { markup, values } = templateResult
   let v = 0 // value count
-  let p = 0 // placeholder count
 
   walk(rootNode, (node) => {
     if (isOpenBrace(node)) {
@@ -101,11 +102,10 @@ export const update = (templateResult, rootNode) => {
 
         return lastNode.nextSibling
       }
-      p++
     } else if (isAttributeSentinel(node)) {
       const stars = node.textContent.match(/(\*+)/)?.[1].split("")
       const target = node.nextSibling
-      const newAttributes = attributeEntries(getAttributes(p, markup))
+      const newAttributes = attributeEntries(getAttributes(markup))
 
       newAttributes.forEach(([name, value]) => {
         if (name === "value") {
@@ -129,7 +129,12 @@ export const update = (templateResult, rootNode) => {
       }
 
       v += stars.length
-      p++
+    } else if (isTextAreaSentinel(node)) {
+      const value = values[v]
+      const textarea = node.previousSibling
+      if (textarea.textContent !== value) {
+        textarea.textContent = value
+      }
     }
   })
 }

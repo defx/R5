@@ -19,7 +19,7 @@ export function html(strings, ...values) {
   const events = new Set()
 
   const markup = strings.reduce((markup, string, i) => {
-    let str = markup + string
+    let str = markup + string.replace(/<\/textarea>/, "</textarea><!--&-->")
 
     if (i > L) return str
 
@@ -61,8 +61,8 @@ export function html(strings, ...values) {
       }
     }
 
-    if (string.startsWith("<textarea")) {
-      return markup + "<!--{-->" + string + values[i]
+    if (str.match(/<textarea [^>]+>$/)) {
+      return str + values[i]
     }
 
     return str + value(values[i])
