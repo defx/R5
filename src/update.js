@@ -83,7 +83,9 @@ export const update = (templateResult, rootNode, breakNode) => {
         }
 
         return
-      } else if (Array.isArray(value) && isTemplateResult(value[0])) {
+      } else if (Array.isArray(value)) {
+        value[0]?.events?.forEach((type) => templateResult.events.add(type))
+
         const blocks = getBlocks(node)
         const nextBlocks = value.map(({ id }, i) => {
           if (id !== undefined) {
@@ -92,6 +94,20 @@ export const update = (templateResult, rootNode, breakNode) => {
             return blocks[i] || Block(value[i])
           }
         })
+
+        const removals = blocks.filter(
+          (b, i) =>
+            !(b.id !== undefined
+              ? nextBlocks.find(({ id }) => id === b.id)
+              : nextBlocks[i])
+        )
+
+        removals.forEach(({ nodes }) => nodes.forEach((node) => node.remove()))
+
+        if (!nextBlocks.length) {
+          return node.nextSibling
+        }
+
         const lastNode = last(last(nextBlocks).nodes)
         let t = node
         nextBlocks.forEach((block, i) => {
