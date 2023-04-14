@@ -87,7 +87,7 @@ export const update = (templateResult, rootNode) => {
           if (id !== undefined) {
             return blocks.find((block) => block.id == id) || Block(value[i])
           } else {
-            return blocks[i]
+            return blocks[i] || Block(value[i])
           }
         })
         const lastNode = last(last(nextBlocks).nodes)
