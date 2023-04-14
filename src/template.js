@@ -70,6 +70,17 @@ export function html(strings, ...values) {
     return str + value(values[i])
   }, "")
 
+  // return {
+  //   markup,
+  //   strings,
+  //   values,
+  //   events,
+  //   key(v) {
+  //     this.id = v
+  //     return this
+  //   },
+  // }
+
   return Object.assign(markup, {
     markup,
     strings,

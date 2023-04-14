@@ -9,11 +9,11 @@ describe("r5", () => {
   })
 
   afterEach(() => {
-    // document.body.removeChild(rootNode)
+    document.body.removeChild(rootNode)
   })
 
   it("returns the markup", () => {
-    assert.equal(html`<p>Hello World!</p>`, `<p>Hello World!</p>`)
+    assert.equal(html`<p>Hello World!</p>`.markup, `<p>Hello World!</p>`)
   })
 
   it("renders static content", () => {
@@ -171,11 +171,12 @@ describe("r5", () => {
       html`hi<textarea maxlength="${2}" autofocus>${"bonjour"}</textarea>`,
       rootNode
     )
-    assert.equal(rootNode.children[0].textContent, "bonjour")
+    assert.equal(rootNode.children[0].value, "bonjour")
+
     render(
       html`<textarea maxlength="${2}" autofocus>${"hello"}</textarea>`,
       rootNode
     )
-    assert.equal(rootNode.children[0].textContent, "hello")
+    assert.equal(rootNode.children[0].value, "hello")
   })
 })
