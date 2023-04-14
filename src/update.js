@@ -64,12 +64,14 @@ function attributeEntries(attributes) {
   )
 }
 
-export const update = (templateResult, rootNode) => {
+export const update = (templateResult, rootNode, breakNode) => {
   const { markup, values } = templateResult
   let v = 0 // value count
   let p = 0 // placeholder count
 
   walk(rootNode, (node) => {
+    if (breakNode && node.isEqualNode(breakNode)) return null
+
     if (isOpenBrace(node)) {
       const { nextSibling } = node
 
@@ -97,7 +99,7 @@ export const update = (templateResult, rootNode) => {
           if (t.nextSibling !== firstChild) {
             t.after(...block.nodes)
           }
-          update(value[i], firstChild)
+          update(value[i], firstChild, firstChild.nextSibling)
           t = last(block.nodes)
         })
 
