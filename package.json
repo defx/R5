@@ -1,7 +1,7 @@
 {
   "name": "@defx/r5",
   "type": "module",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "",
   "main": "dist/r5.min.js",
   "browser": "dist/r5.min.js",

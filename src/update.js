@@ -1,7 +1,5 @@
 import { first, last, walk, templateNodeFromString } from "./helpers.js"
 
-const isTemplateResult = (v) => v?.hasOwnProperty("markup")
-
 const isPrimitive = (v) => v === null || typeof v !== "object"
 
 const isAttributeSentinel = (node) =>

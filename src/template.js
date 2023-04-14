@@ -1,3 +1,5 @@
+import { handlers } from "./events.js"
+
 function stars(n) {
   return new Array(n).fill("*").join("")
 }
@@ -47,9 +49,12 @@ export function html(strings, ...values) {
       if (isAttributeValue) {
         if (isAttributeValue[1].startsWith("on")) {
           const type = isAttributeValue[1].slice(2)
+          const fn = values[i]
+          let index = handlers.indexOf(fn)
+          if (index === -1) index = handlers.push(fn) - 1
           events.add(type)
           str = str.replace(/\s(on[\w]+=['""'])$/, " data-$1")
-          return str + i
+          return str + index
         }
 
         return str + values[i]
