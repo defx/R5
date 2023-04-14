@@ -135,8 +135,8 @@ export const update = (templateResult, rootNode) => {
     } else if (isTextAreaSentinel(node)) {
       const value = values[v]
       const textarea = node.previousSibling
-      if (textarea.textContent !== value) {
-        textarea.textContent = value
+      if (textarea.value !== value) {
+        textarea.value = value
       }
     }
   })
