@@ -166,6 +166,33 @@ describe("r5", () => {
     assert.equal(x, "bar")
   })
 
+  it("binds events (nested templates)", () => {
+    const calls = []
+
+    render(
+      html`
+        <ul>
+          ${[1, 2, 3].map(
+            (n) =>
+              html`
+                <li
+                  onclick="${() => {
+                    calls.push(n)
+                  }}"
+                >
+                  ${n}
+                </li>
+              `
+          )}
+        </ul>
+      `,
+      rootNode
+    )
+    assert.deepEqual(calls, [])
+    rootNode.querySelectorAll(`li`).forEach((el) => el.click())
+    assert.deepEqual(calls, [1, 2, 3])
+  })
+
   it("sets textarea", () => {
     render(
       html`hi<textarea maxlength="${2}" autofocus>${"bonjour"}</textarea>`,

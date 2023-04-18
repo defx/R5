@@ -1,4 +1,5 @@
 import { first, last, walk, templateNodeFromString } from "./helpers.js"
+import { mergeTemplateEvents } from "./events.js"
 
 const isPrimitive = (v) => v === null || typeof v !== "object"
 
@@ -82,7 +83,7 @@ export const update = (templateResult, rootNode, breakNode) => {
 
         return
       } else if (Array.isArray(value)) {
-        value[0]?.events?.forEach((type) => templateResult.events.add(type))
+        mergeTemplateEvents(templateResult, value[0]?.event)
 
         const blocks = getBlocks(node)
         const nextBlocks = value.map(({ id }, i) => {

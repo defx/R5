@@ -1,4 +1,4 @@
-import { handlers } from "./events.js"
+import { mergeTemplateEvents } from "./events.js"
 
 function stars(n) {
   return new Array(n).fill("*").join("")
@@ -15,10 +15,16 @@ function value(v) {
   return `<!--{-->${v}<!--}-->`
 }
 
+let handlerId = 0
+
 export function html(strings, ...values) {
   const L = values.length - 1
   let p = -1
-  const events = new Set()
+
+  const event = {
+    types: [],
+    handlers: {},
+  }
 
   const markup = strings.reduce((markup, string, i) => {
     let str =
@@ -26,6 +32,10 @@ export function html(strings, ...values) {
       string.replace(/<\/[\n\s]*textarea[\n\s]*>/, "</textarea><!--&-->")
 
     if (i > L) return str
+
+    if (Array.isArray(values[i])) {
+      values[i].forEach((v) => mergeTemplateEvents(event, v.event))
+    }
 
     const isElement = str.match(/<[^\/>]+$/)
     const isAttributeValue = str.match(/(\w+-?\w+)=['"]{1}([^'"]*)$/)
@@ -49,12 +59,11 @@ export function html(strings, ...values) {
       if (isAttributeValue) {
         if (isAttributeValue[1].startsWith("on")) {
           const type = isAttributeValue[1].slice(2)
-          const fn = values[i]
-          let index = handlers.indexOf(fn)
-          if (index === -1) index = handlers.push(fn) - 1
-          events.add(type)
+          event.types.push(type)
+          let id = handlerId++
+          event.handlers[id] = values[i]
           str = str.replace(/\s(on[\w]+=['""'])$/, " data-$1")
-          return str + index
+          return str + id
         }
 
         return str + values[i]
@@ -75,25 +84,17 @@ export function html(strings, ...values) {
     return str + value(values[i])
   }, "")
 
-  // return {
-  //   markup,
-  //   strings,
-  //   values,
-  //   events,
-  //   key(v) {
-  //     this.id = v
-  //     return this
-  //   },
-  // }
-
-  return Object.assign(markup, {
+  return {
     markup,
     strings,
     values,
-    events,
+    event: {
+      types: [...new Set(event.types)],
+      handlers: event.handlers,
+    },
     key(v) {
       this.id = v
       return this
     },
-  })
+  }
 }
