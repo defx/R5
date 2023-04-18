@@ -1,16 +1,5 @@
 const eventListeners = new WeakMap()
 
-export function mergeTemplateEvents(a, b) {
-  if (a?.types && b?.types) {
-    a.types.push(...b.types)
-    a.handlers = {
-      ...a.handlers,
-      ...b.handlers,
-    }
-  }
-  return a
-}
-
 export function bindEvents(rootNode, templateResult) {
   const {
     event: { types = [], handlers = {} },
