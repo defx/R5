@@ -13,15 +13,16 @@ function stars(n) {
   return new Array(n).fill("*").join("")
 }
 
-function value(v) {
-  if (v) {
-    if (v.hasOwnProperty("markup")) return `<!--#${v.id}-->${v.markup}`
-    if (Array.isArray(v)) {
-      return `<!--{-->${v.map(value).join("")}<!--}-->`
-    }
-  }
+function looksLikeATemplate(o) {
+  return o?.markup && o?.strings
+}
 
-  return `<!--{-->${v}<!--}-->`
+function value(v) {
+  if (looksLikeATemplate(v)) return `<!--#${v.id}-->${v.markup}`
+  if (Array.isArray(v)) {
+    return `<!--{-->${v.map(value).join("")}<!--}-->`
+  }
+  return `<!--{-->${v ?? ""}<!--}-->`
 }
 
 let handlerId = 0
@@ -42,7 +43,7 @@ export function html(strings, ...values) {
 
     if (i > L) return str
 
-    if (Array.isArray(values[i])) {
+    if (Array.isArray(values[i]) && looksLikeATemplate(values[i][0])) {
       values[i].forEach((v) => mergeTemplateEvents(event, v.event))
     }
 

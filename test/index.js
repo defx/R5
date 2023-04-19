@@ -206,4 +206,46 @@ describe("r5", () => {
     )
     assert.equal(rootNode.children[0].value, "hello")
   })
+
+  it("renders empty string for undefined values", () => {
+    render(
+      html`
+        <pre>
+        ${undefined}
+        </pre
+        >
+      `,
+      rootNode
+    )
+
+    assert.equal(rootNode.textContent.trim(), "")
+  })
+
+  it("renders empty string for null values", () => {
+    render(
+      html`
+        <pre>
+        ${null}
+        </pre
+        >
+      `,
+      rootNode
+    )
+
+    assert.equal(rootNode.textContent.trim(), "")
+  })
+
+  it("renders a non-nullish falsy value", () => {
+    render(
+      html`
+        <pre>
+        ${0}
+        </pre
+        >
+      `,
+      rootNode
+    )
+
+    assert.equal(rootNode.textContent.trim(), "0")
+  })
 })
