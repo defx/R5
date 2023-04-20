@@ -39,7 +39,7 @@ export function html(strings, ...values) {
 
     if (i > L) return str
 
-    if (Array.isArray(values[i]) && looksLikeATemplate(values[i][0])) {
+    if (looksLikeATemplate(values[i]?.[0])) {
       values[i].forEach((v) => mergeTemplateEvents(event, v.event))
     }
 
