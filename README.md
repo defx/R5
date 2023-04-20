@@ -9,7 +9,7 @@
 </div>
 <br />
 
-@defx/r5 is a ~1.5Kb JavaScript library consisting of two essential utility functions that can be used to create and render HTML templates. R5's minimalist design is small and flexible enough to fit into any UI architecture, no matter how simple or complex.
+@defx/r5 is a small JavaScript library consisting of two essential utility functions that can be used to create and render HTML templates. R5's minimalist design is small and flexible enough to fit into any UI architecture, no matter how simple or complex.
 
 R5 templates are written in standard JavaScript with Template Literals.
 
