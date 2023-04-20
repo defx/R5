@@ -1,10 +1,8 @@
 function mergeTemplateEvents(a, b) {
-  if (a?.types && b?.types) {
-    a.types.push(...b.types)
-    a.handlers = {
-      ...a.handlers,
-      ...b.handlers,
-    }
+  a.types.push(...b.types)
+  a.handlers = {
+    ...a.handlers,
+    ...b.handlers,
   }
   return a
 }
