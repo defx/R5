@@ -17,9 +17,7 @@ function looksLikeATemplate(o) {
 
 function value(v) {
   if (looksLikeATemplate(v)) return `<!--#${v.id}-->${v.markup}`
-  if (Array.isArray(v)) {
-    return `<!--{-->${v.map(value).join("")}<!--}-->`
-  }
+  if (Array.isArray(v)) return `<!--{-->${v.map(value).join("")}<!--}-->`
   return `<!--{-->${v ?? ""}<!--}-->`
 }
 
