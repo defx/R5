@@ -15,9 +15,9 @@ function looksLikeATemplate(o) {
   return o?.markup && o?.strings
 }
 
-function value(v) {
+function wrap(v) {
   if (looksLikeATemplate(v)) return `<!--#${v.id}-->${v.markup}`
-  if (Array.isArray(v)) return `<!--{-->${v.map(value).join("")}<!--}-->`
+  if (Array.isArray(v)) return `<!--{-->${v.map(wrap).join("")}<!--}-->`
   return `<!--{-->${v ?? ""}<!--}-->`
 }
 
@@ -87,7 +87,7 @@ export function html(strings, ...values) {
       return str + values[i]
     }
 
-    return str + value(values[i])
+    return str + wrap(values[i])
   }, "")
 
   return {
