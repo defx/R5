@@ -12,6 +12,15 @@ function wrap(v) {
   return `<!--{-->${v ?? ""}<!--}-->`
 }
 
+function mergeTemplateEvents(a, b) {
+  a.types.push(...b.types)
+  a.handlers = {
+    ...a.handlers,
+    ...b.handlers,
+  }
+  return a
+}
+
 let handlerId = 0
 
 export function html(strings, ...values) {
@@ -31,7 +40,7 @@ export function html(strings, ...values) {
     if (i > L) return str
 
     if (looksLikeATemplate(values[i]?.[0])) {
-      values[i].forEach((v) => event.types.push(...v.event.types))
+      values[i].forEach((v) => mergeTemplateEvents(event, v.event))
     }
 
     const isElement = str.match(/<[^\/>]+$/)
