@@ -38,6 +38,5 @@ export function render(templateResult, rootNode) {
   } else {
     update(templateResult, rootNode.firstChild)
   }
-
   bindEvents(rootNode, templateResult)
 }
