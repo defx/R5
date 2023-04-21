@@ -167,7 +167,7 @@ describe("r5", () => {
   })
 
   it("binds events (nested templates)", () => {
-    const calls = []
+    let calls = []
 
     render(
       html`
@@ -188,6 +188,33 @@ describe("r5", () => {
       `,
       rootNode
     )
+
+    assert.deepEqual(calls, [])
+    rootNode.querySelectorAll(`li`).forEach((el) => el.click())
+    assert.deepEqual(calls, [1, 2, 3])
+
+    render(
+      html`
+        <ul>
+          ${[1, 2, 3].map(
+            (n) =>
+              html`
+                <li
+                  onclick="${() => {
+                    calls.push(n)
+                  }}"
+                >
+                  ${n}
+                </li>
+              `
+          )}
+        </ul>
+      `,
+      rootNode
+    )
+
+    calls = []
+
     assert.deepEqual(calls, [])
     rootNode.querySelectorAll(`li`).forEach((el) => el.click())
     assert.deepEqual(calls, [1, 2, 3])

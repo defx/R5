@@ -111,7 +111,7 @@ export const update = (templateResult, rootNode, breakNode) => {
           if (t.nextSibling !== firstChild) {
             t.after(...block.nodes)
           }
-          update(value[i], firstChild, firstChild.nextSibling)
+          update(value[i], firstChild, firstChild.nextElementSibling)
           t = last(block.nodes)
         })
 
