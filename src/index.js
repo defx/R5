@@ -7,7 +7,7 @@ const eventListeners = new WeakMap()
 
 export function bindEvents(rootNode, templateResult) {
   const {
-    event: { types = [], handlers },
+    event: { types = [], handlers = {} },
   } = templateResult
   if (typeof window === "undefined") return
   const listeners = eventListeners.get(rootNode) || {}
