@@ -1,3 +1,12 @@
+function mergeTemplateEvents(a, b) {
+  a.types.push(...b.types)
+  a.handlers = {
+    ...a.handlers,
+    ...b.handlers,
+  }
+  return a
+}
+
 function stars(n) {
   return new Array(n).fill("*").join("")
 }
@@ -10,15 +19,6 @@ function wrap(v) {
   if (looksLikeATemplate(v)) return `<!--#${v.id}-->${v.markup}`
   if (Array.isArray(v)) return `<!--{-->${v.map(wrap).join("")}<!--}-->`
   return `<!--{-->${v ?? ""}<!--}-->`
-}
-
-function mergeTemplateEvents(a, b) {
-  a.types.push(...b.types)
-  a.handlers = {
-    ...a.handlers,
-    ...b.handlers,
-  }
-  return a
 }
 
 let handlerId = 0

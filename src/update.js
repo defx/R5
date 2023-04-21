@@ -129,13 +129,6 @@ export const update = (templateResult, rootNode, breakNode) => {
           return
         }
 
-        // if (name.startsWith("data-on")) {
-        //   const type = name.split("data-on")[1]
-        //   target.$handler = target.$handler || {}
-        //   target.$handler[type] = templateResult.event.handlers[value]
-        //   return
-        // }
-
         if (target.hasAttribute(name)) {
           if (target.getAttribute(name) !== value) {
             target.setAttribute(name, value)
