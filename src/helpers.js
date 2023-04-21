@@ -10,6 +10,7 @@ export const walk = (node, callback, deep = true) => {
   if (v?.nodeName) return walk(v, callback, deep)
 
   if (deep) walk(node.firstChild, callback, deep)
+  if (v === 1) return
   walk(node.nextSibling, callback, deep)
 }
 

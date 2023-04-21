@@ -24,7 +24,6 @@ const getBlocks = (sentinel) => {
         const id = node.textContent.match(/^#(.+)$/)?.[1]
         if (id) {
           blocks.push({ id, nodes: [] })
-          // return
         }
       }
 
@@ -47,10 +46,12 @@ function Block(v) {
 }
 
 function getAttributes(p, markup) {
-  return markup
-    .match(/<!--\*+-->(<[^>]+>)/g)
-    [p].split(/--><[\w-]+\s/)[1]
-    .match(/[^\t\n\f /><"'=]+=['"][^'"]+['"]|(?<!<)[^\t\n\f /><"'=]+/g)
+  return (
+    markup
+      .match(/<!--\*+-->(<[^>]+>)/g)
+      [p]?.split(/--><[\w-]+\s/)[1]
+      .match(/[^\t\n\f /><"'=]+=['"][^'"]+['"]|(?<!<)[^\t\n\f /><"'=]+/g) || []
+  )
 }
 
 function attributeEntries(attributes) {
@@ -62,14 +63,12 @@ function attributeEntries(attributes) {
   )
 }
 
-export const update = (templateResult, rootNode, breakNode) => {
+export const update = (templateResult, rootNode, finalNode) => {
   const { markup, values } = templateResult
   let v = 0 // value count
   let p = 0 // placeholder count
 
   walk(rootNode, (node) => {
-    if (breakNode && node.isEqualNode(breakNode)) return null
-
     if (isOpenBrace(node)) {
       const { nextSibling } = node
 
@@ -83,6 +82,7 @@ export const update = (templateResult, rootNode, breakNode) => {
         return
       } else if (Array.isArray(value)) {
         const blocks = getBlocks(node)
+
         const nextBlocks = value.map(({ id }, i) => {
           if (id !== undefined) {
             return blocks.find((block) => block.id == id) || Block(value[i])
@@ -111,8 +111,8 @@ export const update = (templateResult, rootNode, breakNode) => {
           if (t.nextSibling !== firstChild) {
             t.after(...block.nodes)
           }
-          update(value[i], firstChild, firstChild.nextElementSibling)
           t = last(block.nodes)
+          update(value[i], firstChild, t)
         })
 
         return lastNode.nextSibling
@@ -152,6 +152,10 @@ export const update = (templateResult, rootNode, breakNode) => {
       if (textarea.value !== value) {
         textarea.value = value
       }
+    }
+
+    if (finalNode && node.isEqualNode(finalNode)) {
+      return 1
     }
   })
 }
