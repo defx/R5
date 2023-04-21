@@ -1,12 +1,3 @@
-function mergeTemplateEvents(a, b) {
-  a.types.push(...b.types)
-  a.handlers = {
-    ...a.handlers,
-    ...b.handlers,
-  }
-  return a
-}
-
 function stars(n) {
   return new Array(n).fill("*").join("")
 }
@@ -40,7 +31,7 @@ export function html(strings, ...values) {
     if (i > L) return str
 
     if (looksLikeATemplate(values[i]?.[0])) {
-      values[i].forEach((v) => mergeTemplateEvents(event, v.event))
+      values[i].forEach((v) => event.types.push(...v.event.types))
     }
 
     const isElement = str.match(/<[^\/>]+$/)

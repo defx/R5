@@ -35,7 +35,7 @@ npm install @defx/r5
 ### Installation via CDN
 
 ```js
-import { html } from "https://www.unpkg.com/@defx/r5"
+import { html, render } from "https://www.unpkg.com/@defx/r5"
 ```
 
 ## API

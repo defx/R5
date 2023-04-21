@@ -111,7 +111,7 @@ export const update = (templateResult, rootNode, breakNode) => {
           if (t.nextSibling !== firstChild) {
             t.after(...block.nodes)
           }
-          update(value[i], firstChild, firstChild.nextSibling)
+          update(value[i], firstChild, firstChild.nextElementSibling)
           t = last(block.nodes)
         })
 
@@ -126,6 +126,13 @@ export const update = (templateResult, rootNode, breakNode) => {
       newAttributes.forEach(([name, value]) => {
         if (name === "value") {
           target.value = value
+          return
+        }
+
+        if (name.startsWith("data-on")) {
+          const type = name.split("data-on")[1]
+          target.$handler = target.$handler || {}
+          target.$handler[type] = templateResult.event.handlers[value]
           return
         }
 

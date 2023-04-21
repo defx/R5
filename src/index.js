@@ -3,24 +3,19 @@ import { update } from "./update.js"
 
 const nodes = new WeakSet()
 const isServer = typeof window === "undefined"
-
 const eventListeners = new WeakMap()
 
 export function bindEvents(rootNode, templateResult) {
   const {
-    event: { types = [], handlers = {} },
+    event: { types = [] },
   } = templateResult
   if (typeof window === "undefined") return
   const listeners = eventListeners.get(rootNode) || {}
 
-  rootNode.$handlers = handlers
-
   types.forEach((type) => {
     if (type in listeners) return
-    listeners[type] = (e) => {
-      const index = +e.target.dataset[`on${type}`]
-      rootNode.$handlers[index]?.(e)
-    }
+
+    listeners[type] = (e) => e.target.$handler?.[type]?.(e)
     rootNode.addEventListener(type, listeners[type])
   })
   eventListeners.set(rootNode, listeners)
@@ -35,8 +30,7 @@ export function render(templateResult, rootNode) {
       rootNode.innerHTML = markup
     }
     nodes.add(rootNode)
-  } else {
-    update(templateResult, rootNode.firstChild)
   }
+  update(templateResult, rootNode.firstChild)
   bindEvents(rootNode, templateResult)
 }
