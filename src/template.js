@@ -75,7 +75,8 @@ export function html(strings, ...values) {
         return str + values[i]
       } else {
         const v = values[i]
-        if (values[i]) {
+
+        if (v) {
           return str + `${v}`
         } else {
           return str

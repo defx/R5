@@ -275,4 +275,76 @@ describe("r5", () => {
 
     assert.equal(rootNode.textContent.trim(), "0")
   })
+
+  it("renders svg", () => {
+    render(
+      html`
+        <svg
+          version="1.1"
+          width="300"
+          height="200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect width="100%" height="100%" fill="red" />
+
+          ${new Array(12)
+            .fill(0)
+            .map((_, i) => ({ cx: i * 50, cy: i * 50, r: 25, fill: "green" }))
+            .map(({ cx, cy, r, fill }, i) =>
+              html`
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" />
+              `.key(i)
+            )}
+
+          <text
+            x="150"
+            y="125"
+            font-size="60"
+            text-anchor="middle"
+            fill="white"
+          >
+            SVG
+          </text>
+        </svg>
+      `,
+      rootNode
+    )
+
+    assert.equal(rootNode.querySelector("circle").getAttribute("cx"), "0")
+
+    render(
+      html`
+        <svg
+          version="1.1"
+          width="300"
+          height="200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect width="100%" height="100%" fill="red" />
+
+          ${new Array(12)
+            .fill(0)
+            .map((_, i) => ({ cx: i * 50, cy: i * 50, r: 25, fill: "blue" }))
+            .map(({ cx, cy, r, fill }, i) =>
+              html`
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" />
+              `.key(i)
+            )}
+
+          <text
+            x="150"
+            y="125"
+            font-size="60"
+            text-anchor="middle"
+            fill="white"
+          >
+            SVG
+          </text>
+        </svg>
+      `,
+      rootNode
+    )
+
+    assert.equal(rootNode.querySelector("circle").getAttribute("fill"), "blue")
+  })
 })

@@ -55,3 +55,9 @@ When invoked on the server side, this function will always return a String of HT
 #### hydration
 
 You may also re-render server-rendered html in the browser to "hydrate" the event bindings (R5 will ignore the DOM update step if it sees that the existing HTML matches the generated template object)
+
+## known limitations
+
+If any of these things are holding you back, please raise an issue with a description of your use case
+
+- unquoted attributes attribute are not fully supported
