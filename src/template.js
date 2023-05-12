@@ -18,7 +18,7 @@ function looksLikeATemplate(o) {
 function wrap(v) {
   if (looksLikeATemplate(v)) return `<!--#${v.id}-->${v.markup}`
   if (Array.isArray(v)) return `<!--{-->${v.map(wrap).join("")}<!--}-->`
-  return `<!--{-->${v ?? ""}<!--}-->`
+  return `<!--{-->${v || ""}<!--}-->`
 }
 
 let handlerId = 0
@@ -88,7 +88,13 @@ export function html(strings, ...values) {
       return str + values[i]
     }
 
-    return str + wrap(values[i])
+    const v = values[i]
+
+    if (v === 0) {
+      return str + v
+    }
+
+    return str + wrap(v)
   }, "")
 
   return {

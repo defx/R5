@@ -9,7 +9,7 @@ describe("r5", () => {
   })
 
   afterEach(() => {
-    document.body.removeChild(rootNode)
+    // document.body.removeChild(rootNode)
   })
 
   it("returns the markup", () => {
@@ -346,5 +346,49 @@ describe("r5", () => {
     )
 
     assert.equal(rootNode.querySelector("circle").getAttribute("fill"), "blue")
+  })
+
+  it("auto-suggest", () => {
+    const template = ({ suggestions, searchText }, dispatch) =>
+      html`
+        <input
+          type="text"
+          oninput="${(e) =>
+            dispatch("searchTextInput", { text: e.target.value })}"
+          value="${searchText}"
+        />
+        <ul>
+          ${searchText.length >= 2 &&
+          suggestions.map(({ id, text }) =>
+            html`<li onclick="${() => dispatch("suggestionClick", { id })}">
+              ${text}
+            </li> `.key(id)
+          )}
+        </ul>
+      `
+
+    const suggestions = [
+      {
+        id: 0,
+        text: "ac milan",
+      },
+      { id: 1, text: "inter milan" },
+    ]
+
+    render(
+      template({
+        suggestions,
+        searchText: "",
+      }),
+      rootNode
+    )
+
+    render(
+      template({
+        suggestions,
+        searchText: "ac",
+      }),
+      rootNode
+    )
   })
 })
