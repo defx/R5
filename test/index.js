@@ -348,7 +348,7 @@ describe("r5", () => {
     assert.equal(rootNode.querySelector("circle").getAttribute("fill"), "blue")
   })
 
-  it("auto-suggest", () => {
+  it("handles conditional blocks", () => {
     const template = ({ suggestions, searchText }, dispatch) =>
       html`
         <input
@@ -390,5 +390,17 @@ describe("r5", () => {
       }),
       rootNode
     )
+
+    assert.equal(rootNode.querySelectorAll(`li`).length, 2)
+
+    render(
+      template({
+        suggestions,
+        searchText: "",
+      }),
+      rootNode
+    )
+
+    assert.equal(rootNode.querySelectorAll(`li`).length, 0)
   })
 })

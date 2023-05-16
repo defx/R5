@@ -70,40 +70,29 @@ export const update = (templateResult, rootNode, finalNode) => {
 
   walk(rootNode, (node) => {
     if (isOpenBrace(node)) {
-      const { nextSibling } = node
-
+      const blocks = getBlocks(node)
       const value = values[v++]
+      const { nextSibling } = node
+      const blockValue = Array.isArray(value) ? value : []
 
-      if (isPrimitive(value)) {
-        if (nextSibling.textContent !== value) {
-          nextSibling.textContent = value
+      const nextBlocks = blockValue.map(({ id }, i) => {
+        if (id !== undefined) {
+          return blocks.find((block) => block.id == id) || Block(value[i])
+        } else {
+          return blocks[i] || Block(value[i])
         }
+      })
 
-        return
-      } else if (Array.isArray(value)) {
-        const blocks = getBlocks(node)
+      const removals = blocks.filter(
+        (b, i) =>
+          !(b.id !== undefined
+            ? nextBlocks.find(({ id }) => id === b.id)
+            : nextBlocks[i])
+      )
 
-        const nextBlocks = value.map(({ id }, i) => {
-          if (id !== undefined) {
-            return blocks.find((block) => block.id == id) || Block(value[i])
-          } else {
-            return blocks[i] || Block(value[i])
-          }
-        })
+      removals.forEach(({ nodes }) => nodes.forEach((node) => node.remove()))
 
-        const removals = blocks.filter(
-          (b, i) =>
-            !(b.id !== undefined
-              ? nextBlocks.find(({ id }) => id === b.id)
-              : nextBlocks[i])
-        )
-
-        removals.forEach(({ nodes }) => nodes.forEach((node) => node.remove()))
-
-        if (!nextBlocks.length) {
-          return node.nextSibling
-        }
-
+      if (nextBlocks.length) {
         const lastNode = last(last(nextBlocks).nodes)
         let t = node
         nextBlocks.forEach((block, i) => {
@@ -117,6 +106,15 @@ export const update = (templateResult, rootNode, finalNode) => {
 
         return lastNode.nextSibling
       }
+
+      if (isPrimitive(value)) {
+        if (nextSibling.textContent !== value) {
+          nextSibling.textContent = value
+        }
+
+        return
+      }
+
       p++
     } else if (isAttributeSentinel(node)) {
       const stars = node.textContent.match(/(\*+)/)?.[1].split("")
