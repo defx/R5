@@ -127,6 +127,14 @@ export const update = (templateResult, rootNode, finalNode) => {
           return
         }
 
+        const valueIndex = value.match(/{{(\d+)}}/)
+
+        if (valueIndex) {
+          target[name] = values[valueIndex[1]]
+
+          return
+        }
+
         if (target.hasAttribute(name)) {
           if (target.getAttribute(name) !== value) {
             target.setAttribute(name, value)

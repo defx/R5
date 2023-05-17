@@ -403,4 +403,24 @@ describe("r5", () => {
 
     assert.equal(rootNode.querySelectorAll(`li`).length, 0)
   })
+
+  it("binds non-primitive values as props", () => {
+    const items = [
+      { title: "feed the dog" },
+      { title: "walk the cat" },
+      { title: "play for time" },
+    ]
+
+    render(
+      html`
+        <!-- hi -->
+        <todo-app items="${items}"></todo-app>
+        <!-- bye -->
+      `,
+      rootNode
+    )
+
+    assert.ok(rootNode.querySelector(`todo-app`).items)
+    assert.equal(rootNode.querySelector(`todo-app`).items, items)
+  })
 })

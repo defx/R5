@@ -1,3 +1,5 @@
+const isPrimitive = (v) => v === null || typeof v !== "object"
+
 function mergeTemplateEvents(a, b) {
   a.types.push(...b.types)
   a.handlers = {
@@ -72,10 +74,15 @@ export function html(strings, ...values) {
           return str + id
         }
 
-        return str + values[i]
-      } else {
         const v = values[i]
 
+        if (isPrimitive(v)) {
+          return str + v
+        } else {
+          return str + `{{${i}}}`
+        }
+      } else {
+        const v = values[i]
         if (v) {
           return str + `${v}`
         } else {
