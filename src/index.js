@@ -5,6 +5,12 @@ const nodes = new WeakSet()
 const isServer = typeof window === "undefined"
 const eventListeners = new WeakMap()
 
+function nodeFromString(str) {
+  let tpl = document.createElement("template")
+  tpl.innerHTML = str.trim()
+  return tpl.content.cloneNode(true)
+}
+
 export function bindEvents(rootNode, templateResult) {
   const {
     event: { types = [], handlers = {} },
@@ -32,11 +38,10 @@ export function render(templateResult, rootNode) {
 
   if (!nodes.has(rootNode)) {
     if (rootNode.innerHTML !== markup) {
-      rootNode.innerHTML = markup
+      rootNode.prepend(nodeFromString(markup))
     }
     nodes.add(rootNode)
-  } else {
-    update(templateResult, rootNode.firstChild)
   }
+  update(templateResult, rootNode)
   bindEvents(rootNode, templateResult)
 }
